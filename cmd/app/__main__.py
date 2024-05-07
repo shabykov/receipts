@@ -6,7 +6,7 @@ from internal.repository.image.extractor.chatgpt.repository import Repository as
 from internal.repository.receipt.recognizer.chatgpt.repository import Repository as ReceiptRecognizer
 from internal.usecase.receipt.recognizer import UseCase
 
-from .config import init_settings
+from cmd.app.config import init_settings
 
 
 class App:

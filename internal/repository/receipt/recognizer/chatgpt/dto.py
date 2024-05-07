@@ -28,14 +28,14 @@ def convert(data: ReceiptDTO) -> Receipt:
         store_addr=data.store_addr,
         time=data.time,
         date=data.date,
-        items=convert_items(data.items),
+        items=convert_products(data.products),
         tips=data.tips,
         subtotal=data.subtotal,
         total=data.total
     )
 
 
-def convert_items(products: t.List[ProductDTO]) -> t.List[Item]:
+def convert_products(products: t.List[ProductDTO]) -> t.List[Item]:
     items = []
     for p in products:
         items.append(

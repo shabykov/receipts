@@ -30,7 +30,7 @@ class Repository(ImageExtractor):
             resp = requests.post(
                 self._api_url,
                 headers=headers(self._api_key),
-                json=payload,
+                json=payload(image),
             )
         except Exception as e:
             return "", handle_err(e)

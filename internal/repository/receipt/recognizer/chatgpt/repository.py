@@ -38,7 +38,7 @@ class Repository(Recognizer):
         image_content, err = self._extractor.extract(image)
         if err is not None:
             return Receipt(), ReceiptRecognizeError(
-                message="unable to extract receipt image: %s" % err.error,
+                message="unable to extract receipt image: %s" % err.message,
                 code=ReceiptRecognizeErrorCode.recognize_receipt_extractor_image_error
             )
 
