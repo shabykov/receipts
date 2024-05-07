@@ -64,6 +64,7 @@ class Delivery:
 
     def handle_image(self, message: Message):
         receipt, err = self.receipt_recognizer_uc.recognize(
+            message.from_user.id,
             convert(self.bot, message)
         )
         if err is not None:
@@ -78,6 +79,7 @@ class Delivery:
 
     def handle_image_document(self, message: Message):
         receipt, err = self.receipt_recognizer_uc.recognize(
+            message.from_user.id,
             convert(self.bot, message)
         )
         if err is not None:

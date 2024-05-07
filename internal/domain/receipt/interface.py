@@ -6,7 +6,6 @@ from internal.domain.receipt.error import ReceiptRecognizeError
 from internal.domain.receipt.model import Receipt, UUID4
 
 
-
 class Creator(ABC):
     @abstractmethod
     def create(self, receipt: Receipt):

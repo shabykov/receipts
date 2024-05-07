@@ -11,15 +11,17 @@ from internal.usecase.usecase import ReceiptRecognizer
 
 
 class UseCase(ReceiptRecognizer):
-    def __init__(self, recognizer: Recognizer):
+    def __init__(self, recognizer: Recognizer, creator: Creator):
         self._recognizer = recognizer
-        #self._creator = creator
+        self._creator = creator
 
-    def recognize(self, image: Image) -> t.Tuple[Receipt, t.Optional[ReceiptRecognizeError]]:
+    def recognize(self, user_id: int, image: Image) -> t.Tuple[Receipt, t.Optional[ReceiptRecognizeError]]:
         receipt, err = self._recognizer.recognize(image)
         if err is not None:
             return receipt, err
 
-        #self._creator.create(receipt)
+        if receipt.is_valid():
+            receipt.set_user_id(user_id)
+            self._creator.create(receipt)
 
         return receipt, None

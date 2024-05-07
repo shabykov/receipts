@@ -1,12 +1,14 @@
+import sqlite3
+
 from openai import OpenAI
 from telebot import TeleBot
 
+from cmd.app.config import init_settings
 from internal.delivery.telegram_bot.delivery import Delivery
 from internal.repository.image.extractor.chatgpt.repository import Repository as ImageExtractor
 from internal.repository.receipt.recognizer.chatgpt.repository import Repository as ReceiptRecognizer
+from internal.repository.receipt.storage.pandas.repository import Repository as ReceiptStorage
 from internal.usecase.receipt.recognizer import UseCase
-
-from cmd.app.config import init_settings
 
 
 class App:
@@ -30,11 +32,13 @@ if __name__ == "__main__":
         client=openai_client,
         extractor=image_extractor,
     )
+    receipt_storage = ReceiptStorage()
     app = App(
         telegram_bot_listener=Delivery(
             bot=telegram_bot,
             receipt_recognizer_uc=UseCase(
-                recognizer=receipt_recognizer
+                recognizer=receipt_recognizer,
+                creator=receipt_storage,
             )
         )
     )

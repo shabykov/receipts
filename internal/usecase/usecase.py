@@ -7,7 +7,7 @@ from internal.domain.receipt import Receipt, ReceiptRecognizeError
 
 class ReceiptRecognizer(ABC):
     @abstractmethod
-    def recognize(self, image: Image) -> t.Tuple[Receipt, t.Optional[ReceiptRecognizeError]]:
+    def recognize(self, user_id: int, image: Image) -> t.Tuple[Receipt, t.Optional[ReceiptRecognizeError]]:
         raise NotImplementedError("method `.recognize()` must be implemented")
 
 

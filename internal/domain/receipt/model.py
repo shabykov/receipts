@@ -21,6 +21,9 @@ class Item(BaseModel):
 
 
 class Receipt(BaseModel):
+    user_id: int = Field(
+        default=0
+    )
     uuid: UUID4 = Field(
         default_factory=uuid.uuid4
     )
@@ -51,6 +54,9 @@ class Receipt(BaseModel):
     created_at: datetime = Field(
         default_factory=datetime.now
     )
+
+    def set_user_id(self, user_id: int):
+        self.user_id = user_id
 
     def is_valid(self) -> bool:
         # required condition to valid receipt
