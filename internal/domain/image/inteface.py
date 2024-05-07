@@ -6,8 +6,8 @@ from .error import ImageExtractError
 
 class Image(ABC):
     @abstractmethod
-    def format(self) -> str:
-        raise NotImplementedError("method `.format()` must be implemented")
+    def url(self) -> str:
+        raise NotImplementedError("method `.url()` must be implemented")
 
     @abstractmethod
     def data(self) -> str:

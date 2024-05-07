@@ -102,7 +102,7 @@ def payload(image: Image) -> dict:
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": "data:image/%s;base64,%s" % (image.format(), image.data())
+                            "url": image.url()
                         }
                     }
                 ]
