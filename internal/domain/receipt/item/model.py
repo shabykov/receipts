@@ -16,9 +16,6 @@ class Item(BaseModel):
     price: float = Field(
         default=0
     )
-    rating: float = Field(
-        default=0
-    )
     created_at: datetime = Field(
         default_factory=datetime.now
     )

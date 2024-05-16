@@ -1,6 +1,12 @@
+from .error import (
+    ReceiptReadError,
+    ReceiptRecognizeError,
+    ReceiptRecognizeErrorCode,
+    ReceiptCreateError,
+    ReceiptUpdateError,
+)
 from .interface import Creator, Updater, Reader, Recognizer
 from .model import Receipt, Item, new
-from .error import ReceiptRecognizeError, ReceiptRecognizeErrorCode
 
 __all__ = (
     'new',
@@ -12,4 +18,7 @@ __all__ = (
     'Updater',
     'Reader',
     'Recognizer',
+    'ReceiptReadError',
+    'ReceiptCreateError',
+    'ReceiptUpdateError',
 )

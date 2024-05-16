@@ -1,9 +1,7 @@
-import sqlite3
-
 from openai import OpenAI
 from telebot import TeleBot
 
-from cmd.app.config import init_settings
+from app.config import init_settings
 from internal.delivery.telegram_bot.delivery import Delivery
 from internal.repository.image.extractor.chatgpt.repository import Repository as ImageExtractor
 from internal.repository.receipt.recognizer.chatgpt.repository import Repository as ReceiptRecognizer

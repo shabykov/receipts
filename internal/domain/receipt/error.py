@@ -11,3 +11,18 @@ class ReceiptRecognizeErrorCode(enum.IntEnum):
 class ReceiptRecognizeError(BaseModel):
     message: str
     code: ReceiptRecognizeErrorCode
+
+
+class ReceiptCreateError(BaseModel):
+    message: str
+    code: str
+
+
+class ReceiptUpdateError(BaseModel):
+    message: str
+    code: str
+
+
+class ReceiptReadError(BaseModel):
+    message: str
+    code: str

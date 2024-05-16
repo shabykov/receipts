@@ -4,20 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, UUID4
 
-
-class Item(BaseModel):
-    product: str = Field(
-        default="unknown"
-    )
-    quantity: int = Field(
-        default=0
-    )
-    price: float = Field(
-        default=0
-    )
-    rating: float = Field(
-        default=0
-    )
+from .item.model import Item
 
 
 class Receipt(BaseModel):
