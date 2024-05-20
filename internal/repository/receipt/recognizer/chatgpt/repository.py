@@ -6,6 +6,7 @@ import typing as t
 
 import instructor
 from openai import OpenAI
+from logging import getLogger
 
 from internal.domain.image import (
     Image,
@@ -19,6 +20,8 @@ from internal.domain.receipt import (
 
 )
 from .dto import convert, ReceiptDTO
+
+logger = getLogger("receipt.recognizer.catgpt")
 
 default_role = "user"
 default_model = "gpt-4"
@@ -50,6 +53,9 @@ class Repository(Recognizer):
             ]
         )
         if isinstance(receipt_data, ReceiptDTO):
+
+            logger.info("receipt successfully recognized: receipt_data=%s" % receipt_data)
+
             return convert(receipt_data), None
 
         return Receipt(), ReceiptRecognizeError(

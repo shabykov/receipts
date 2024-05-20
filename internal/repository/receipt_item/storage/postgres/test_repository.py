@@ -1,5 +1,6 @@
 import typing as t
 import uuid
+from logging import Logger, getLogger
 
 import psycopg
 import pytest
@@ -16,9 +17,14 @@ def conn() -> psycopg.Connection:
     conn.close()
 
 
+@pytest.fixture(scope="session")
+def logger() -> Logger:
+    return getLogger("test")
+
+
 @pytest.fixture(scope="function")
-def repo(conn) -> Repository:
-    repo = Repository(conn)
+def repo(conn, logger) -> Repository:
+    repo = Repository(conn, logger)
 
     repo.init_schema()
 

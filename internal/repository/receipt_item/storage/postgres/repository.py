@@ -2,6 +2,7 @@ import typing as t
 
 import psycopg
 from pydantic import UUID4
+from logging import getLogger
 
 from internal.domain.receipt.item import (
     Item,
@@ -14,6 +15,8 @@ from internal.domain.receipt.item.error import (
     ReceiptItemUpdateError,
     ReceiptItemReadError
 )
+
+logger = getLogger("receipt_item.storage.postgres")
 
 CREATE_SCHEMA_SQL = """
     CREATE TABLE IF NOT EXISTS tbl_receipt_item (
@@ -95,11 +98,13 @@ class Repository(Creator, Updater, Reader):
         with self._conn.cursor() as cur:
             cur.execute(query=CREATE_SCHEMA_SQL)
         self._conn.commit()
+        logger.info("receipt item schema is ready")
 
     def clean(self):
         with self._conn.cursor() as cur:
             cur.execute(query=CLEAN_SCHEMA_SQL)
         self._conn.commit()
+        logger.info("receipt item schema cleaned")
 
     def create(self, receipt_uuid: UUID4, item: Item) -> t.Optional[ReceiptItemCreateError]:
         try:
@@ -123,6 +128,7 @@ class Repository(Creator, Updater, Reader):
             )
         else:
             self._conn.commit()
+            logger.info("receipt item created: receipt_uuid=%s, uuid=%s" % (receipt_uuid, item.uuid))
         return None
 
     def create_many(self, receipt_uuid: UUID4, items: t.List[Item]) -> t.Optional[ReceiptItemCreateError]:
@@ -149,6 +155,9 @@ class Repository(Creator, Updater, Reader):
             )
         else:
             self._conn.commit()
+            logger.info(
+                "receipt items created: receipt_uuid=%s, items_count=%d" % (receipt_uuid, len(items))
+            )
         return None
 
     def update(self, receipt_uuid: UUID4, item: Item) -> t.Optional[ReceiptItemUpdateError]:
@@ -172,6 +181,7 @@ class Repository(Creator, Updater, Reader):
             )
         else:
             self._conn.commit()
+            logger.info("receipt item updated: receipt_uuid=%s, uuid=%s" % (receipt_uuid, item.uuid))
         return None
 
     def update_many(self, receipt_uuid: UUID4, items: t.List[Item]) -> t.Optional[ReceiptItemUpdateError]:
@@ -197,6 +207,9 @@ class Repository(Creator, Updater, Reader):
             )
         else:
             self._conn.commit()
+            logger.info(
+                "receipt items updated: receipt_uuid=%s, items_count=%d" % (receipt_uuid, len(items))
+            )
         return None
 
     def read_by_uuid(self, uuid: UUID4) -> t.Tuple[

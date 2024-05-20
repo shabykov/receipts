@@ -2,13 +2,15 @@ import typing as t
 
 import pydantic.errors
 import requests
-
+from logging import getLogger
 from internal.domain.image import (
     Image,
     ImageExtractor,
     ImageExtractError,
 )
 from .dto import SuccessDTO, ErrorDTO
+
+logger = getLogger("image.extractor.chatgpt")
 
 default_url = "https://api.openai.com/v1/chat/completions"
 default_role = "user"
@@ -38,7 +40,10 @@ class Repository(ImageExtractor):
         if resp.status_code != 200:
             return "", handle_failure(resp)
 
-        return handle_success(resp)
+        ret, err = handle_success(resp)
+        if err is None:
+            logger.info("image successfully extracted: image_url=%s" % image.url())
+        return ret, err
 
 
 def handle_err(err: Exception) -> ImageExtractError:

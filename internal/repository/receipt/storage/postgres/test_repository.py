@@ -1,3 +1,5 @@
+from logging import Logger, getLogger
+
 import psycopg
 import pytest
 
@@ -13,9 +15,14 @@ def conn() -> psycopg.Connection:
     conn.close()
 
 
+@pytest.fixture(scope="session")
+def logger() -> Logger:
+    return getLogger("test")
+
+
 @pytest.fixture(scope="function")
-def item_repo(conn) -> ItemRepository:
-    repo = ItemRepository(conn)
+def item_repo(conn, logger) -> ItemRepository:
+    repo = ItemRepository(conn, logger)
 
     repo.init_schema()
 
@@ -25,8 +32,8 @@ def item_repo(conn) -> ItemRepository:
 
 
 @pytest.fixture(scope="function")
-def repo(conn, item_repo) -> Repository:
-    repo = Repository(conn, item_repo)
+def repo(conn, item_repo, logger) -> Repository:
+    repo = Repository(conn, item_repo, logger)
 
     repo.init_schema()
 

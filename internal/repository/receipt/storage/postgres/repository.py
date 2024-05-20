@@ -1,4 +1,5 @@
 import typing as t
+from logging import getLogger
 
 import psycopg
 from pydantic import UUID4
@@ -15,6 +16,8 @@ from internal.domain.receipt import (
 from internal.repository.receipt_item.storage.postgres.repository import (
     Repository as ItemRepository
 )
+
+logger = getLogger("receipt.storge.postgres")
 
 CREATE_SCHEMA_SQL = """
     CREATE TABLE IF NOT EXISTS tbl_receipt (
@@ -122,11 +125,13 @@ class Repository(Creator, Updater, Reader):
         with self._conn.cursor() as cur:
             cur.execute(query=CREATE_SCHEMA_SQL)
         self._conn.commit()
+        logger.info("receipt schema is ready")
 
     def clean(self):
         with self._conn.cursor() as cur:
             cur.execute(query=CLEAN_SCHEMA_SQL)
         self._conn.commit()
+        logger.info("receipt schema cleaned")
 
     def create(self, receipt: Receipt) -> t.Optional[ReceiptCreateError]:
         err = self._item_repo.create_many(receipt.uuid, receipt.items)
@@ -165,6 +170,7 @@ class Repository(Creator, Updater, Reader):
 
         else:
             self._conn.commit()
+            logger.info("receipt created: receipt_uuid=%s" % receipt.uuid)
 
         return None
 
@@ -203,6 +209,7 @@ class Repository(Creator, Updater, Reader):
 
         else:
             self._conn.commit()
+            logger.info("receipt updated: receipt_uuid=%s" % receipt.uuid)
 
         return None
 
