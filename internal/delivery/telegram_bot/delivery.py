@@ -1,5 +1,10 @@
 from telebot import TeleBot
-from telebot.types import Message
+from telebot.types import (
+    Message,
+    WebAppInfo,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+)
 
 from internal.usecase.usecase import (
     ReceiptRecognizer,
@@ -44,6 +49,10 @@ class Delivery:
         def document(message: Message):
             self.handle_image_document(message)
 
+        @self.bot.message_handler(content_types=['web_app_data'])
+        def web_app_data(message: Message):
+            self.handle_web_app_data(message)
+
     def handle_help(self, message: Message):
         self.bot.send_message(
             message.chat.id,
@@ -72,9 +81,20 @@ class Delivery:
                 message,
                 text=err.message
             )
+
+        reply_keyboard_markup = ReplyKeyboardMarkup(row_width=1)
+        reply_keyboard_markup.add(
+            KeyboardButton(
+                text="",
+                web_app=WebAppInfo(
+                    url=""
+                )
+            )
+        )
         return self.bot.reply_to(
             message,
-            text=receipt.json()
+            text=receipt.json(),
+            reply_markup=reply_keyboard_markup
         )
 
     def handle_image_document(self, message: Message):
@@ -91,3 +111,6 @@ class Delivery:
             message,
             text=receipt.json()
         )
+
+    def handle_web_app_data(self, message: Message):
+        pass
