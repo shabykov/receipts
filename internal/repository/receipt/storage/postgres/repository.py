@@ -252,5 +252,5 @@ class Repository(Creator, Updater, Reader):
         ret.items = items
         return ret, None
 
-    def read_many(self, limit: int, offset: int) -> t.Tuple[t.List[Receipt], t.Optional[ReceiptReadError]]:
+    def read_many(self, user_id: int, limit: int, offset: int) -> t.Tuple[t.List[Receipt], t.Optional[ReceiptReadError]]:
         pass

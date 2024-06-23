@@ -4,7 +4,6 @@ from logging import (
     ERROR,
     WARNING,
     getLogger,
-    Logger,
     Formatter,
     StreamHandler,
 )
@@ -14,7 +13,7 @@ FORMATTER = Formatter(
 )
 
 
-def init_logging(level: str):
+def init_logging():
     root = getLogger()
     root.setLevel(DEBUG)
     root.addHandler(err_handler())

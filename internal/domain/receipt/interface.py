@@ -29,7 +29,7 @@ class Reader(ABC):
         raise NotImplementedError("method `.read_by_uuid()` must be implemented")
 
     @abstractmethod
-    def read_many(self, limit: int, offset: int) -> t.Tuple[t.List[Receipt], t.Optional[ReceiptReadError]]:
+    def read_many(self, user_id: int, limit: int, offset: int) -> t.Tuple[t.List[Receipt], t.Optional[ReceiptReadError]]:
         raise NotImplementedError("method `.read_many()` must be implemented")
 
 
