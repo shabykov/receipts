@@ -1,4 +1,3 @@
-import typing as t
 from flask import Flask
 from flask_pydantic import validate
 from pydantic import BaseModel, Field
