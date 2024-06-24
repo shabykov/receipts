@@ -19,9 +19,6 @@ class Settings(BaseSettings, case_sensitive=False):
         env_file='.env',
         env_file_encoding='utf-8'
     )
-    app_name: str = Field(
-        default="receipt_bot"
-    )
     logging_level: str = Field(
         default="INFO"
     )

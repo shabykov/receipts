@@ -24,9 +24,6 @@ class Settings(BaseSettings, case_sensitive=False):
     web_host: str = Field(
         default="0.0.0.0"
     )
-    app_name: str = Field(
-        default="receipt_bot"
-    )
     logging_level: str = Field(
         default="INFO"
     )
