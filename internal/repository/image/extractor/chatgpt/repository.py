@@ -23,16 +23,18 @@ class Repository(ImageExtractor):
             self,
             api_key: str,
             api_url: str = default_url,
+            model: str = default_model,
     ):
         self._api_url = api_url
         self._api_key = api_key
+        self._model = model
 
     def extract(self, image: Image) -> t.Tuple[str, t.Optional[ImageExtractError]]:
         try:
             resp = requests.post(
                 self._api_url,
                 headers=headers(self._api_key),
-                json=payload(image),
+                json=payload(image, self._model),
             )
         except Exception as e:
             return "", handle_err(e)
@@ -93,9 +95,9 @@ def headers(api_key: str) -> dict[str, str]:
     }
 
 
-def payload(image: Image) -> dict:
+def payload(image: Image, model: str) -> dict:
     return {
-        "model": default_model,
+        "model": model,
         "messages": [
             {
                 "role": default_role,

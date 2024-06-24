@@ -32,6 +32,8 @@ postgresql_conn = connect(
 )
 image_extractor = ImageExtractor(
     api_key=settings.openai_api_key.get_secret_value(),
+    api_url=settings.openai_api_url.unicode_string(),
+    model=settings.openai_model
 )
 receipt_recognizer = ReceiptRecognizer(
     client=openai_client,

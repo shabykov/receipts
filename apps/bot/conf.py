@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from pydantic import (
     Field,
+    HttpUrl,
     SecretStr,
     PostgresDsn,
 )
@@ -26,6 +27,8 @@ class Settings(BaseSettings, case_sensitive=False):
     )
     telegram_bot_token: SecretStr
     openai_api_key: SecretStr
+    openai_api_url: HttpUrl
+    openai_model: str
     postgresql_url: PostgresDsn
 
 

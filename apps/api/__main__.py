@@ -39,7 +39,7 @@ delivery = Delivery(
     receipt_reader_uc=ReceiptReaderUc(
         reader=receipt_storage,
     ),
-    flask=app,
+    flask_app=app,
     host=settings.web_host,
     port=settings.web_port,
 )
