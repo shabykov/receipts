@@ -6,12 +6,12 @@ from internal.domain.receipt import (
     ICreator,
     IRecognizer,
 )
-from internal.usecase.interface import IReceiptRecognize
+from internal.usecase.interface import IReceiptRecognizeUC
 
 logger = getLogger("receipt.recognizer")
 
 
-class ReceiptRecognizeUseCase(IReceiptRecognize):
+class ReceiptRecognizeUseCase(IReceiptRecognizeUC):
     def __init__(self, recognizer: IRecognizer, creator: ICreator):
         self._recognizer = recognizer
         self._creator = creator

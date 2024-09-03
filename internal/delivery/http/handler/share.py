@@ -1,14 +1,14 @@
 from flask import Request, render_template
 
 from internal.domain.user import User
-from internal.usecase.interface import IReceiptShare, IReceiptRead
+from internal.usecase.interface import IReceiptShareUC, IReceiptReadUC
 
 
 class ShareHandler:
     def __init__(
             self,
-            receipt_share_uc: IReceiptShare,
-            receipt_reader_uc: IReceiptRead,
+            receipt_share_uc: IReceiptShareUC,
+            receipt_reader_uc: IReceiptReadUC,
     ):
         self.receipt_share_uc = receipt_share_uc
         self.receipt_reader_uc = receipt_reader_uc

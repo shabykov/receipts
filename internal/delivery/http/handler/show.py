@@ -1,12 +1,12 @@
 from flask import render_template
 
-from internal.usecase.interface import IReceiptRead
+from internal.usecase.interface import IReceiptReadUC
 
 
 class ShowHandler:
     def __init__(
             self,
-            receipt_reader_uc: IReceiptRead,
+            receipt_reader_uc: IReceiptReadUC,
     ):
         self.receipt_reader_uc = receipt_reader_uc
 

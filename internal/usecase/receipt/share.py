@@ -10,12 +10,12 @@ from internal.domain.user import (
     IReader as IUserReader,
     ICreator as IUserCreator
 )
-from internal.usecase.interface import IReceiptShare
+from internal.usecase.interface import IReceiptShareUC
 
 logger = getLogger("receipt.share")
 
 
-class ReceiptShareUseCase(IReceiptShare):
+class ReceiptShareUseCase(IReceiptShareUC):
     def __init__(
             self,
             user_reader: IUserReader,

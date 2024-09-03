@@ -3,10 +3,10 @@ import typing as t
 from pydantic import UUID4
 
 from internal.domain.receipt import Receipt, IReader
-from internal.usecase.interface import IReceiptRead
+from internal.usecase.interface import IReceiptReadUC
 
 
-class ReceiptReadUseCase(IReceiptRead):
+class ReceiptReadUseCase(IReceiptReadUC):
     def __init__(self, reader: IReader):
         self._reader = reader
 

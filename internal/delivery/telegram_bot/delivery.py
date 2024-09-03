@@ -2,7 +2,7 @@ from telebot import TeleBot
 from telebot.types import Message
 
 from internal.domain.receipt import ReceiptRecognizeError
-from internal.usecase.interface import IReceiptRecognize
+from internal.usecase.interface import IReceiptRecognizeUC
 from .photo.converter import convert
 
 
@@ -10,7 +10,7 @@ class Delivery:
     def __init__(
             self,
             bot: TeleBot,
-            receipt_recognizer_uc: IReceiptRecognize
+            receipt_recognizer_uc: IReceiptRecognizeUC
     ):
         self.bot = bot
         self.receipt_recognizer_uc = receipt_recognizer_uc

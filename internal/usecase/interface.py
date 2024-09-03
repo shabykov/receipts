@@ -8,13 +8,13 @@ from internal.domain.receipt import Receipt
 from internal.domain.user import User
 
 
-class IReceiptRecognize(ABC):
+class IReceiptRecognizeUC(ABC):
     @abstractmethod
     def recognize(self, user_id: int, image: Image) -> Receipt:
         raise NotImplementedError("method `.recognize()` must be implemented")
 
 
-class IReceiptRead(ABC):
+class IReceiptReadUC(ABC):
     @abstractmethod
     def read(self, receipt_uuid: UUID4) -> t.Optional[Receipt]:
         # public read interface
@@ -25,7 +25,7 @@ class IReceiptRead(ABC):
         raise NotImplementedError("method `.read_many()` must be implemented")
 
 
-class IReceiptShare(ABC):
+class IReceiptShareUC(ABC):
     @abstractmethod
     def share(self, receipt: Receipt, with_user: User):
         # public share interface
