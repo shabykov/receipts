@@ -3,21 +3,20 @@ used this example
 https://medium.com/@foxmike/extracting-structured-data-from-images-using-openais-gpt-4-vision-and-jason-liu-s-instructor-ec7f54ee0a91
 """
 import typing as t
+from logging import getLogger
 
 import instructor
 from openai import OpenAI
-from logging import getLogger
 
 from internal.domain.image import (
     Image,
     ImageExtractor,
+    ImageExtractError
 )
 from internal.domain.receipt import (
     Receipt,
-    Recognizer,
+    IRecognizer,
     ReceiptRecognizeError,
-    ReceiptRecognizeErrorCode,
-
 )
 from .dto import convert, ReceiptDTO
 
@@ -31,19 +30,17 @@ default_content_prefix = (
 )
 
 
-class Repository(Recognizer):
+class Repository(IRecognizer):
     def __init__(self, client: OpenAI, extractor: ImageExtractor, model: str = default_model):
         self._client = instructor.patch(client)
         self._extractor = extractor
         self._model = model
 
-    def recognize(self, image: Image) -> t.Tuple[Receipt, t.Optional[ReceiptRecognizeError]]:
-        image_content, err = self._extractor.extract(image)
-        if err is not None:
-            return Receipt(), ReceiptRecognizeError(
-                message="unable to extract receipt image: %s" % err.message,
-                code=ReceiptRecognizeErrorCode.recognize_receipt_extractor_image_error
-            )
+    def recognize(self, image: Image) -> Receipt:
+        try:
+            image_content = self._extractor.extract(image)
+        except ImageExtractError as err:
+            raise ReceiptRecognizeError("unable to extract receipt image: %s" % err)
 
         receipt_data = self._client.chat.completions.create(
             model=self._model,
@@ -53,15 +50,11 @@ class Repository(Recognizer):
             ]
         )
         if isinstance(receipt_data, ReceiptDTO):
-
             logger.info("receipt successfully recognized: receipt_data=%s" % receipt_data)
 
-            return convert(receipt_data), None
+            return convert(receipt_data)
 
-        return Receipt(), ReceiptRecognizeError(
-            message="unable to recognize receipt image",
-            code=ReceiptRecognizeErrorCode.recognize_receipt_error
-        )
+        raise ReceiptRecognizeError("unable to recognize receipt image")
 
 
 def make_message(content: str) -> dict[str, str]:

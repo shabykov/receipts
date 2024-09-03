@@ -1,8 +1,8 @@
-import typing as t
+from logging import getLogger
 
 import pydantic.errors
 import requests
-from logging import getLogger
+
 from internal.domain.image import (
     Image,
     ImageExtractor,
@@ -29,7 +29,7 @@ class Repository(ImageExtractor):
         self._api_key = api_key
         self._model = model
 
-    def extract(self, image: Image) -> t.Tuple[str, t.Optional[ImageExtractError]]:
+    def extract(self, image: Image) -> str:
         try:
             resp = requests.post(
                 self._api_url,
@@ -37,55 +37,37 @@ class Repository(ImageExtractor):
                 json=payload(image, self._model),
             )
         except Exception as e:
-            return "", handle_err(e)
+            raise ImageExtractError(str(e))
 
         if resp.status_code != 200:
-            return "", handle_failure(resp)
+            handle_failure(resp)
 
-        ret, err = handle_success(resp)
-        if err is None:
-            logger.info("image successfully extracted: image_url=%s" % image.url())
-        return ret, err
+        return handle_success(resp)
 
 
 def handle_err(err: Exception) -> ImageExtractError:
-    return ImageExtractError(
-        message=str(err),
-        code="requests_err"
-    )
+    raise ImageExtractError(str(err))
 
 
-def handle_failure(resp: requests.Response) -> ImageExtractError:
+def handle_failure(resp: requests.Response):
     try:
         err = ErrorDTO.parse_obj(resp.json())
     except pydantic.ValidationError as err:
-        return ImageExtractError(
-            message="parse error_message err: %s" % str(err),
-            code="error_message_validation_err",
-        )
+        raise ImageExtractError("parse error_message err: %s" % str(err))
 
-    return ImageExtractError(
-        message=err.error.message,
-        code=err.error.code,
-    )
+    return ImageExtractError(err.error.message)
 
 
-def handle_success(resp: requests.Response) -> t.Tuple[str, t.Optional[ImageExtractError]]:
+def handle_success(resp: requests.Response) -> str:
     try:
         ans = SuccessDTO.parse_obj(resp.json())
     except pydantic.ValidationError as err:
-        return "", ImageExtractError(
-            message="parse success_message err: %s" % str(err),
-            code="success_message_validation_err",
-        )
+        raise ImageExtractError("parse success_message err: %s" % str(err))
 
     if len(ans.choices) < 1:
-        return "", ImageExtractError(
-            message="empty answer",
-            code="empty_answer_err",
-        )
+        raise ImageExtractError("empty answer")
 
-    return ans.choices[0].message.content, None
+    return ans.choices[0].message.content
 
 
 def headers(api_key: str) -> dict[str, str]:

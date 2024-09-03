@@ -1,24 +1,24 @@
-from .error import (
+from ._error import (
     ReceiptReadError,
     ReceiptRecognizeError,
-    ReceiptRecognizeErrorCode,
     ReceiptCreateError,
     ReceiptUpdateError,
+    ReceiptShareErr,
 )
-from .interface import Creator, Updater, Reader, Recognizer
-from .model import Receipt, Item, new
+from ._interface import ICreator, IUpdater, IReader, IRecognizer
+from ._model import Receipt, ReceiptItem, new
 
 __all__ = (
     'new',
-    'Item',
+    'ReceiptItem',
     'Receipt',
     'ReceiptRecognizeError',
-    'ReceiptRecognizeErrorCode',
-    'Creator',
-    'Updater',
-    'Reader',
-    'Recognizer',
+    'ICreator',
+    'IUpdater',
+    'IReader',
+    'IRecognizer',
     'ReceiptReadError',
     'ReceiptCreateError',
     'ReceiptUpdateError',
+    'ReceiptShareErr',
 )

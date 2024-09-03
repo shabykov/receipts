@@ -4,7 +4,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, UUID4
 
-from .item.model import Item
+from internal.domain.receipt.item import ReceiptItem
+from pkg.datetime.now import now
 
 
 class Receipt(BaseModel):
@@ -26,7 +27,7 @@ class Receipt(BaseModel):
     time: str = Field(
         default="unknown"
     )
-    items: t.List[Item] = Field(
+    items: t.List[ReceiptItem] = Field(
         default=[]
     )
     subtotal: float = Field(
@@ -39,7 +40,10 @@ class Receipt(BaseModel):
         default=0
     )
     created_at: datetime = Field(
-        default_factory=datetime.now
+        default_factory=now
+    )
+    is_shared: bool = Field(
+        default=False
     )
 
     def set_user_id(self, user_id: int):
@@ -55,7 +59,7 @@ def new(
         store_addr: str,
         time: str,
         date: str,
-        items: t.List[Item],
+        items: t.List[ReceiptItem],
         tips: float,
         subtotal: float,
         total: float) -> Receipt:

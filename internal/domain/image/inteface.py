@@ -1,7 +1,4 @@
-import typing as t
 from abc import ABC, abstractmethod
-
-from .error import ImageExtractError
 
 
 class Image(ABC):
@@ -16,5 +13,5 @@ class Image(ABC):
 
 class ImageExtractor(ABC):
     @abstractmethod
-    def extract(self, image: Image) -> t.Tuple[str, t.Optional[ImageExtractError]]:
+    def extract(self, image: Image) -> str:
         raise NotImplementedError("method `extract` must be implemented")

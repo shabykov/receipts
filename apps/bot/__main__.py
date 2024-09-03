@@ -5,11 +5,10 @@ from logging import getLogger
 
 from pkg.log import init_logging
 from internal.delivery.telegram_bot.delivery import Delivery
-from internal.repository.image.extractor.chatgpt.repository import Repository as ImageExtractor
-from internal.repository.receipt.recognizer.chatgpt.repository import Repository as ReceiptRecognizer
+from internal.repository.receipt.recognizer.chatgpt.repository_v2 import Repository as ReceiptRecognizer
 from internal.repository.receipt.storage.postgres.repository import Repository as ReceiptStorage
 from internal.repository.receipt_item.storage.postgres.repository import Repository as ReceiptItemStorage
-from internal.usecase.receipt.recognizer import UseCase as ReceiptRecognizerUc
+from internal.usecase.receipt.recognize import ReceiptRecognizeUseCase
 
 from apps.bot.conf import init_settings
 
@@ -30,14 +29,9 @@ openai_client = OpenAI(
 postgresql_conn = connect(
     conninfo=settings.postgresql_url.unicode_string()
 )
-image_extractor = ImageExtractor(
-    api_key=settings.openai_api_key.get_secret_value(),
-    api_url=settings.openai_api_url.unicode_string(),
-    model=settings.openai_model
-)
 receipt_recognizer = ReceiptRecognizer(
     client=openai_client,
-    extractor=image_extractor
+    model=settings.openai_model
 )
 receipt_item_storage = ReceiptItemStorage(
     conn=postgresql_conn
@@ -49,7 +43,7 @@ receipt_storage = ReceiptStorage(
 
 delivery = Delivery(
     bot=telegram_bot,
-    receipt_recognizer_uc=ReceiptRecognizerUc(
+    receipt_recognizer_uc=ReceiptRecognizeUseCase(
         recognizer=receipt_recognizer,
         creator=receipt_storage,
     )

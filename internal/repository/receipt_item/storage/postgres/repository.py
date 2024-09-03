@@ -1,19 +1,19 @@
 import typing as t
+from logging import getLogger
 
 import psycopg
 from pydantic import UUID4
-from logging import getLogger
 
 from internal.domain.receipt.item import (
-    Item,
-    Creator,
-    Updater,
-    Reader,
+    ReceiptItem,
+    ICreator,
+    IUpdater,
+    IReader,
 )
-from internal.domain.receipt.item.error import (
+from internal.domain.receipt.item import (
     ReceiptItemCreateError,
     ReceiptItemUpdateError,
-    ReceiptItemReadError
+    ReceiptItemReadError,
 )
 
 logger = getLogger("receipt_item.storage.postgres")
@@ -90,7 +90,7 @@ SELECT_RECEIPT_ITEMS_SQL = """
 """
 
 
-class Repository(Creator, Updater, Reader):
+class Repository(ICreator, IUpdater, IReader):
     def __init__(self, conn: psycopg.Connection):
         self._conn = conn
 
@@ -106,7 +106,7 @@ class Repository(Creator, Updater, Reader):
         self._conn.commit()
         logger.info("receipt item schema cleaned")
 
-    def create(self, receipt_uuid: UUID4, item: Item) -> t.Optional[ReceiptItemCreateError]:
+    def create(self, receipt_uuid: UUID4, item: ReceiptItem):
         try:
             with self._conn.cursor() as cur:
                 cur.execute(
@@ -122,16 +122,13 @@ class Repository(Creator, Updater, Reader):
                 )
         except psycopg.errors.DatabaseError as e:
             self._conn.rollback()
-            return ReceiptItemCreateError(
-                message="insert items err: %s" % e,
-                code="database_error"
-            )
+            raise ReceiptItemCreateError("insert items err: %s" % e)
         else:
             self._conn.commit()
             logger.info("receipt item created: receipt_uuid=%s, uuid=%s" % (receipt_uuid, item.uuid))
         return None
 
-    def create_many(self, receipt_uuid: UUID4, items: t.List[Item]) -> t.Optional[ReceiptItemCreateError]:
+    def create_many(self, receipt_uuid: UUID4, items: t.List[ReceiptItem]):
         try:
             with self._conn.cursor() as cur:
                 cur.executemany(
@@ -149,10 +146,7 @@ class Repository(Creator, Updater, Reader):
                 )
         except psycopg.errors.DatabaseError as e:
             self._conn.rollback()
-            return ReceiptItemCreateError(
-                message="insert items err: %s" % e,
-                code="database_error"
-            )
+            raise ReceiptItemCreateError("insert items err: %s" % e)
         else:
             self._conn.commit()
             logger.info(
@@ -160,7 +154,7 @@ class Repository(Creator, Updater, Reader):
             )
         return None
 
-    def update(self, receipt_uuid: UUID4, item: Item) -> t.Optional[ReceiptItemUpdateError]:
+    def update(self, receipt_uuid: UUID4, item: ReceiptItem):
         try:
             with self._conn.cursor() as cur:
                 cur.execute(
@@ -175,16 +169,13 @@ class Repository(Creator, Updater, Reader):
                 )
         except psycopg.errors.DatabaseError as e:
             self._conn.rollback()
-            return ReceiptItemUpdateError(
-                message="upsert items err: %s" % e,
-                code="database_error"
-            )
+            raise ReceiptItemUpdateError("upsert item err: %s" % e)
         else:
             self._conn.commit()
             logger.info("receipt item updated: receipt_uuid=%s, uuid=%s" % (receipt_uuid, item.uuid))
         return None
 
-    def update_many(self, receipt_uuid: UUID4, items: t.List[Item]) -> t.Optional[ReceiptItemUpdateError]:
+    def update_many(self, receipt_uuid: UUID4, items: t.List[ReceiptItem]):
         try:
             with self._conn.cursor() as cur:
                 cur.executemany(
@@ -201,10 +192,7 @@ class Repository(Creator, Updater, Reader):
                 )
         except psycopg.errors.DatabaseError as e:
             self._conn.rollback()
-            return ReceiptItemUpdateError(
-                message="upsert items err: %s" % e,
-                code="database_error"
-            )
+            raise ReceiptItemUpdateError("upsert items err: %s" % e)
         else:
             self._conn.commit()
             logger.info(
@@ -212,9 +200,7 @@ class Repository(Creator, Updater, Reader):
             )
         return None
 
-    def read_by_uuid(self, uuid: UUID4) -> t.Tuple[
-        t.Optional[Item], t.Optional[ReceiptItemReadError]
-    ]:
+    def read_by_uuid(self, uuid: UUID4) -> t.Optional[ReceiptItem]:
         try:
             with self._conn.cursor() as cur:
                 cur.execute(
@@ -226,22 +212,17 @@ class Repository(Creator, Updater, Reader):
 
                 row = cur.fetchone()
         except psycopg.errors.DatabaseError as e:
-            return None, ReceiptItemReadError(
-                message="select item err: %s" % e,
-                code="database_error"
-            )
+            raise ReceiptItemReadError("select item err: %s" % e)
 
-        return Item(
+        return ReceiptItem(
             uuid=row[0],
             product=row[1],
             quantity=row[2],
             price=row[3],
             created_at=row[4]
-        ), None
+        )
 
-    def read_many(self, receipt_uuid: UUID4, limit: int = 100, offset: int = 0) -> t.Tuple[
-        t.List[Item], t.Optional[ReceiptItemReadError]
-    ]:
+    def read_many(self, receipt_uuid: UUID4, limit: int = 100, offset: int = 0) -> t.List[ReceiptItem]:
         items = []
         try:
             with self._conn.cursor() as cur:
@@ -256,7 +237,7 @@ class Repository(Creator, Updater, Reader):
 
                 for row in cur:
                     items.append(
-                        Item(
+                        ReceiptItem(
                             uuid=row[0],
                             product=row[1],
                             quantity=row[2],
@@ -265,9 +246,6 @@ class Repository(Creator, Updater, Reader):
                         )
                     )
         except psycopg.errors.DatabaseError as e:
-            return items, ReceiptItemReadError(
-                message="select items err: %s" % e,
-                code="database_error"
-            )
+            raise ReceiptItemReadError("select items err: %s" % e)
 
-        return items, None
+        return items

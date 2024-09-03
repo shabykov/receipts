@@ -1,17 +1,23 @@
+import os
 from flask import Flask
 from psycopg import connect
 from logging import getLogger
 
 from pkg.log import init_logging
 from internal.delivery.http.delivery import Delivery
+from internal.delivery.http.handler.show import ShowHandler
+from internal.delivery.http.handler.share import ShareHandler
 from internal.repository.receipt.storage.postgres.repository import Repository as ReceiptStorage
 from internal.repository.receipt_item.storage.postgres.repository import Repository as ReceiptItemStorage
-from internal.usecase.receipt.updater import UseCase as ReceiptUpdaterUc
-from internal.usecase.receipt.reader import UseCase as ReceiptReaderUc
+from internal.usecase.receipt.read import ReceiptReadUseCase
+from internal.usecase.receipt.share import ReceiptShareUseCase
 
-from apps.api.conf import init_settings
+from apps.web.conf import init_settings
 
-app = Flask(__name__)
+template_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
+template_dir = os.path.join(template_dir, 'templates')
+
+app = Flask(__name__, template_folder="../../internal/delivery/http/handler/templates")
 
 init_logging()
 
@@ -33,11 +39,18 @@ receipt_storage = ReceiptStorage(
 )
 
 delivery = Delivery(
-    receipt_updater_uc=ReceiptUpdaterUc(
-        updater=receipt_storage,
+    receipt_share_handler=ShareHandler(
+        receipt_share_uc=ReceiptShareUseCase(
+            updater=receipt_storage,
+        ),
+        receipt_reader_uc=ReceiptReadUseCase(
+            reader=receipt_storage,
+        ),
     ),
-    receipt_reader_uc=ReceiptReaderUc(
-        reader=receipt_storage,
+    receipt_show_handler=ShowHandler(
+        receipt_reader_uc=ReceiptReadUseCase(
+            reader=receipt_storage,
+        ),
     ),
     flask_app=app,
     host=settings.web_host,
@@ -56,6 +69,6 @@ class App:
 if __name__ == "__main__":
     web_app = App(http_listener=delivery)
 
-    logger.info("start web api")
+    logger.info("start web web")
 
     web_app.start()

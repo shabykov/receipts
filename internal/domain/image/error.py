@@ -1,6 +1,2 @@
-from pydantic import BaseModel
-
-
-class ImageExtractError(BaseModel):
-    message: str
-    code: str
+class ImageExtractError(Exception):
+    pass

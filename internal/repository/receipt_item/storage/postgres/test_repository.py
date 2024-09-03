@@ -1,12 +1,11 @@
 import typing as t
 import uuid
-from logging import Logger, getLogger
 
 import psycopg
 import pytest
 from pydantic import UUID4
 
-from internal.domain.receipt.item import Item
+from internal.domain.receipt.item import ReceiptItem
 from internal.repository.receipt_item.storage.postgres.repository import Repository
 
 
@@ -17,14 +16,9 @@ def conn() -> psycopg.Connection:
     conn.close()
 
 
-@pytest.fixture(scope="session")
-def logger() -> Logger:
-    return getLogger("test")
-
-
 @pytest.fixture(scope="function")
-def repo(conn, logger) -> Repository:
-    repo = Repository(conn, logger)
+def repo(conn) -> Repository:
+    repo = Repository(conn)
 
     repo.init_schema()
 
@@ -39,8 +33,8 @@ def receipt_uuid() -> UUID4:
 
 
 @pytest.fixture(scope="function")
-def item() -> Item:
-    return Item(
+def item() -> ReceiptItem:
+    return ReceiptItem(
         product="pepsi cola",
         quantity=3,
         price=5678
@@ -58,19 +52,19 @@ def test_create(repo, receipt_uuid, item):
 
 
 @pytest.fixture(scope="function")
-def items() -> t.List[Item]:
+def items() -> t.List[ReceiptItem]:
     return [
-        Item(
+        ReceiptItem(
             product="pepsi cola",
             quantity=3,
             price=5678
         ),
-        Item(
+        ReceiptItem(
             product="banan",
             quantity=3,
             price=100,
         ),
-        Item(
+        ReceiptItem(
             product="apple",
             quantity=3,
             price=100,

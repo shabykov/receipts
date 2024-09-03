@@ -2,10 +2,10 @@ import typing as t
 
 from pydantic import BaseModel
 
-from internal.domain.receipt import Receipt, Item, new
+from internal.domain.receipt import Receipt, ReceiptItem, new
 
 
-class ProductDTO(BaseModel):
+class ReceiptItemDTO(BaseModel):
     name: str
     quantity: int
     price: float
@@ -16,7 +16,7 @@ class ReceiptDTO(BaseModel):
     store_addr: str
     date: str
     time: str
-    products: t.List[ProductDTO]
+    items: t.List[ReceiptItemDTO]
     subtotal: float
     tips: float
     total: float
@@ -28,18 +28,18 @@ def convert(data: ReceiptDTO) -> Receipt:
         store_addr=data.store_addr,
         time=data.time,
         date=data.date,
-        items=convert_products(data.products),
+        items=convert_products(data.items),
         tips=data.tips,
         subtotal=data.subtotal,
         total=data.total
     )
 
 
-def convert_products(products: t.List[ProductDTO]) -> t.List[Item]:
+def convert_products(products: t.List[ReceiptItemDTO]) -> t.List[ReceiptItem]:
     items = []
     for p in products:
         items.append(
-            Item(
+            ReceiptItem(
                 product=p.name,
                 quantity=p.quantity,
                 price=p.price,

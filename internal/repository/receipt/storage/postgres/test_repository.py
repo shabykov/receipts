@@ -1,9 +1,7 @@
-from logging import Logger, getLogger
-
 import psycopg
 import pytest
 
-from internal.domain.receipt import Receipt, Item
+from internal.domain.receipt import Receipt, ReceiptItem
 from internal.repository.receipt.storage.postgres.repository import Repository
 from internal.repository.receipt_item.storage.postgres.repository import Repository as ItemRepository
 
@@ -15,14 +13,9 @@ def conn() -> psycopg.Connection:
     conn.close()
 
 
-@pytest.fixture(scope="session")
-def logger() -> Logger:
-    return getLogger("test")
-
-
 @pytest.fixture(scope="function")
-def item_repo(conn, logger) -> ItemRepository:
-    repo = ItemRepository(conn, logger)
+def item_repo(conn) -> ItemRepository:
+    repo = ItemRepository(conn)
 
     repo.init_schema()
 
@@ -32,8 +25,8 @@ def item_repo(conn, logger) -> ItemRepository:
 
 
 @pytest.fixture(scope="function")
-def repo(conn, item_repo, logger) -> Repository:
-    repo = Repository(conn, item_repo, logger)
+def repo(conn, item_repo) -> Repository:
+    repo = Repository(conn, item_repo)
 
     repo.init_schema()
 
@@ -49,17 +42,17 @@ def receipt() -> Receipt:
         store_name="magnum",
         store_addr="dostyk avenue 46",
         items=[
-            Item(
+            ReceiptItem(
                 product="fanta",
                 quantity=2,
                 price=1000
             ),
-            Item(
+            ReceiptItem(
                 product="coco col 1",
                 quantity=1,
                 price=1000
             ),
-            Item(
+            ReceiptItem(
                 product="coco col 3",
                 quantity=1,
                 price=1000

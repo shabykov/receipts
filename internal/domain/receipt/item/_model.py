@@ -2,8 +2,10 @@ import uuid
 from datetime import datetime
 from pydantic import BaseModel, Field, UUID4
 
+from pkg.datetime.now import now
 
-class Item(BaseModel):
+
+class ReceiptItem(BaseModel):
     uuid: UUID4 = Field(
         default_factory=uuid.uuid4
     )
@@ -17,12 +19,12 @@ class Item(BaseModel):
         default=0
     )
     created_at: datetime = Field(
-        default_factory=datetime.now
+        default_factory=now
     )
 
 
-def new(product: str, quantity: int, price: float) -> Item:
-    return Item(
+def new(product: str, quantity: int, price: float) -> ReceiptItem:
+    return ReceiptItem(
         product=product,
         quantity=quantity,
         price=price,

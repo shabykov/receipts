@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form method="post">
+    <table>
+        <thead>
+        <tr>
+            <h2>Contact info</h2>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th>Store</th>
+            <td>{{receipt.store_name}}</td>
+        </tr>
+        <tr>
+            <th>Addr</th>
+            <td>{{receipt.store_addr}}</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>{{receipt.date}} {{receipt.time}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th>Choice</th>
+        </thead>
+        <tbody>
+        {% for item in receipt.items %}
+        <tr>
+            <td>{{item.product}}</td>
+            <td>{{item.quantity}}</td>
+            <td>{{item.price}}</td>
+            <td><input type="checkbox" id="{{ item.uuid}}"></td>
+        </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+    <table>
+        <tbody>
+        <tr>
+            <th>Subtotal</th>
+            <td>{{receipt.subtotal}}</td>
+        </tr>
+        <tr>
+            <th>Tips</th>
+            <td>{{receipt.tips}}</td>
+        </tr>
+        <tr>
+            <th>Total</th>
+            <td>{{receipt.total}}</td>
+        </tr>
+        </tbody>
+    </table>
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}

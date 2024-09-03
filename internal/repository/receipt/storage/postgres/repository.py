@@ -6,12 +6,17 @@ from pydantic import UUID4
 
 from internal.domain.receipt import (
     Receipt,
-    Creator,
-    Updater,
-    Reader,
+    ICreator,
+    IUpdater,
+    IReader,
     ReceiptReadError,
     ReceiptCreateError,
     ReceiptUpdateError,
+)
+from internal.domain.receipt.item import (
+    ReceiptItemCreateError,
+    ReceiptItemReadError,
+    ReceiptItemUpdateError,
 )
 from internal.repository.receipt_item.storage.postgres.repository import (
     Repository as ItemRepository
@@ -116,7 +121,7 @@ SELECT_RECEIPT_SQL = """
 """
 
 
-class Repository(Creator, Updater, Reader):
+class Repository(ICreator, IUpdater, IReader):
     def __init__(self, conn: psycopg.Connection, item_repo: ItemRepository):
         self._conn = conn
         self._item_repo = item_repo
@@ -133,13 +138,11 @@ class Repository(Creator, Updater, Reader):
         self._conn.commit()
         logger.info("receipt schema cleaned")
 
-    def create(self, receipt: Receipt) -> t.Optional[ReceiptCreateError]:
-        err = self._item_repo.create_many(receipt.uuid, receipt.items)
-        if err is not None:
-            return ReceiptCreateError(
-                message="receipt items create err: %s" % err,
-                code="item_creator_error"
-            )
+    def create(self, receipt: Receipt):
+        try:
+            self._item_repo.create_many(receipt.uuid, receipt.items)
+        except ReceiptItemCreateError as err:
+            raise ReceiptCreateError("receipt items create err: %s" % err)
 
         try:
             with self._conn.cursor() as cur:
@@ -163,10 +166,7 @@ class Repository(Creator, Updater, Reader):
 
             self._conn.rollback()
 
-            return ReceiptCreateError(
-                message="insert receipt err: %s" % e,
-                code="database_error"
-            )
+            raise ReceiptCreateError("insert receipt err: %s" % e)
 
         else:
             self._conn.commit()
@@ -174,13 +174,11 @@ class Repository(Creator, Updater, Reader):
 
         return None
 
-    def update(self, receipt: Receipt) -> t.Optional[ReceiptUpdateError]:
-        err = self._item_repo.update_many(receipt.uuid, receipt.items)
-        if err is not None:
-            return ReceiptUpdateError(
-                message="receipt items update err: %s" % err,
-                code="item_creator_error"
-            )
+    def update(self, receipt: Receipt):
+        try:
+            self._item_repo.update_many(receipt.uuid, receipt.items)
+        except ReceiptItemUpdateError as err:
+            raise ReceiptUpdateError("receipt items update err: %s" % err)
 
         try:
             with self._conn.cursor() as cur:
@@ -202,10 +200,7 @@ class Repository(Creator, Updater, Reader):
 
             self._conn.rollback()
 
-            return ReceiptUpdateError(
-                message="insert receipt err: %s" % e,
-                code="database_error"
-            )
+            raise ReceiptUpdateError("insert receipt err: %s" % e)
 
         else:
             self._conn.commit()
@@ -213,13 +208,11 @@ class Repository(Creator, Updater, Reader):
 
         return None
 
-    def read_by_uuid(self, uuid: UUID4) -> t.Tuple[t.Optional[Receipt], t.Optional[ReceiptReadError]]:
-        items, err = self._item_repo.read_many(uuid, 100, 0)
-        if err is not None:
-            return None, ReceiptReadError(
-                message="read receipt items err: %s" % err,
-                code="database_error"
-            )
+    def read_by_uuid(self, uuid: UUID4) -> t.Optional[Receipt]:
+        try:
+            items = self._item_repo.read_many(uuid, 100, 0)
+        except ReceiptItemReadError as err:
+            raise ReceiptReadError("read receipt items err: %s" % err)
 
         try:
             with self._conn.cursor() as cur:
@@ -232,10 +225,7 @@ class Repository(Creator, Updater, Reader):
 
                 row = cur.fetchone()
         except psycopg.errors.DatabaseError as e:
-            return None, ReceiptReadError(
-                message="select receipt err: %s" % e,
-                code="database_error"
-            )
+            raise ReceiptReadError("select receipt err: %s" % e)
 
         ret = Receipt(
             user_id=row[0],
@@ -250,7 +240,7 @@ class Repository(Creator, Updater, Reader):
             created_at=row[9]
         )
         ret.items = items
-        return ret, None
+        return ret
 
-    def read_many(self, user_id: int, limit: int, offset: int) -> t.Tuple[t.List[Receipt], t.Optional[ReceiptReadError]]:
-        pass
+    def read_many(self, user_id: int, limit: int, offset: int) -> t.List[Receipt]:
+        return []

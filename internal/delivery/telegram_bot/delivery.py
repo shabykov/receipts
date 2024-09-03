@@ -1,14 +1,8 @@
 from telebot import TeleBot
-from telebot.types import (
-    Message,
-    WebAppInfo,
-    KeyboardButton,
-    ReplyKeyboardMarkup,
-)
+from telebot.types import Message
 
-from internal.usecase.usecase import (
-    ReceiptRecognizer,
-)
+from internal.domain.receipt import ReceiptRecognizeError
+from internal.usecase.interface import IReceiptRecognize
 from .photo.converter import convert
 
 
@@ -16,7 +10,7 @@ class Delivery:
     def __init__(
             self,
             bot: TeleBot,
-            receipt_recognizer_uc: ReceiptRecognizer
+            receipt_recognizer_uc: IReceiptRecognize
     ):
         self.bot = bot
         self.receipt_recognizer_uc = receipt_recognizer_uc
@@ -34,24 +28,9 @@ class Delivery:
         def start(message: Message):
             self.handle_start(message)
 
-        @self.bot.message_handler(content_types=['text'])
-        def text(message: Message):
-            self.handle_text(message)
-
         @self.bot.message_handler(content_types=['photo', 'image'])
         def image(message: Message):
-            self.handle_image(message)
-
-        @self.bot.message_handler(
-            func=lambda message: message.document.mime_type == 'image/jpg',
-            content_types=['document'],
-        )
-        def document(message: Message):
-            self.handle_image_document(message)
-
-        @self.bot.message_handler(content_types=['web_app_data'])
-        def web_app_data(message: Message):
-            self.handle_web_app_data(message)
+            self.handle_receipt(message)
 
     def handle_help(self, message: Message):
         self.bot.send_message(
@@ -62,7 +41,7 @@ class Delivery:
     def handle_start(self, message: Message):
         self.bot.send_message(
             message.chat.id,
-            text="To start just senf photo of your receipt"
+            text="To start just send photo of your /receipt"
         )
 
     def handle_text(self, message: Message):
@@ -71,46 +50,24 @@ class Delivery:
             text="I cant help you with text requests"
         )
 
-    def handle_image(self, message: Message):
-        receipt, err = self.receipt_recognizer_uc.recognize(
-            message.from_user.id,
-            convert(self.bot, message)
-        )
-        if err is not None:
+    def handle_receipt(self, message: Message):
+        try:
+            receipt = self.receipt_recognizer_uc.recognize(
+                message.from_user.id,
+                convert(self.bot, message)
+            )
+        except ReceiptRecognizeError as err:
             return self.bot.reply_to(
                 message,
-                text=err.message
+                text=str(err),
             )
-
-        reply_keyboard_markup = ReplyKeyboardMarkup(row_width=1)
-        reply_keyboard_markup.add(
-            KeyboardButton(
-                text="",
-                web_app=WebAppInfo(
-                    url=""
-                )
-            )
-        )
-        return self.bot.reply_to(
-            message,
-            text=receipt.json(),
-            reply_markup=reply_keyboard_markup
-        )
-
-    def handle_image_document(self, message: Message):
-        receipt, err = self.receipt_recognizer_uc.recognize(
-            message.from_user.id,
-            convert(self.bot, message)
-        )
-        if err is not None:
+        except Exception as err:
             return self.bot.reply_to(
                 message,
-                text=err.message
+                text="unknown err: %s" % str(err),
             )
+
         return self.bot.reply_to(
             message,
-            text=receipt.json()
+            text=f"http://localhost:8080/receipts/{receipt.uuid}/show",
         )
-
-    def handle_web_app_data(self, message: Message):
-        pass
