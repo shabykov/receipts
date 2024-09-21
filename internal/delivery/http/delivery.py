@@ -1,7 +1,7 @@
 from flask import Flask, request
 from pydantic import BaseModel, Field
 
-from pkg.session import SessionManager, check_session
+from pkg.session import SessionManager
 from .handler.login import LoginHandler
 from .handler.show import ShowHandler
 from .handler.split import SplitHandler
@@ -46,12 +46,19 @@ class Delivery:
 
         @self.flask.route('/telegram_login_callback', methods=['GET'])
         def telegram_login_callback():
-            return self.login_handler.telegram_login_callback(request)
+            return self.login_handler.telegram_login_callback(
+                request
+            )
 
         @self.flask.route("/receipts/<receipt_uuid>/show", methods=['GET'])
         def show(receipt_uuid: str):
-            return self.receipt_show_handler.show(receipt_uuid)
+            return self.receipt_show_handler.show(
+                receipt_uuid,
+            )
 
         @self.flask.route("/receipts/<receipt_uuid>/split", methods=['GET', 'POST'])
         def split(receipt_uuid: str):
-            return self.receipt_split_handler.split(receipt_uuid, request=request)
+            return self.receipt_split_handler.split(
+                receipt_uuid,
+                request=request
+            )

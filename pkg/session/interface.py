@@ -10,11 +10,11 @@ class SessionManager(ABC):
         raise NotImplementedError('method .key() must be implemented')
 
     @abstractmethod
-    def encode_key(self, user_key: str) -> str:
+    def encode(self, user_key: str) -> str:
         raise NotImplementedError('method .encode() must be implemented')
 
     @abstractmethod
-    def decode_val(self, session_value) -> str:
+    def decode(self, session_value) -> str:
         raise NotImplementedError('method .decode() must be implemented')
 
 
@@ -31,7 +31,7 @@ class check_session:
             if not session_val:
                 return redirect(url_for('login', error="empty session"))
 
-            user_key = self._manager.decode_val(session_val)
+            user_key = self._manager.decode(session_val)
             request.data["user_id"] = user_key
             return func(*args, **kwargs)
 

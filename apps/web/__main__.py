@@ -7,6 +7,7 @@ from psycopg import connect
 from apps.web.conf import init_settings
 from internal.delivery.http.delivery import Delivery
 from internal.delivery.http.handler.login import LoginHandler
+from internal.delivery.http.handler.session import SessionChecker
 from internal.delivery.http.handler.show import ShowHandler
 from internal.delivery.http.handler.split import SplitHandler
 from internal.repository.receipt.storage.postgres.repository import Repository as ReceiptStorage
@@ -28,6 +29,8 @@ app = Flask(__name__, template_folder="../../internal/delivery/http/handler/temp
 init_logging()
 
 settings = init_settings()
+
+app.secret_key = settings.secret_key.get_secret_value()
 
 logger = getLogger("web_api")
 
@@ -54,8 +57,9 @@ split_storage = SplitStorage()
 receipt_reader_uc = ReceiptReadUseCase(
     reader=receipt_storage,
 )
-session_manager = Base64SessionManager(
-    session_key="session_id"
+session_manager = Base64SessionManager()
+session_checker = SessionChecker(
+    user_uc=user_uc
 )
 delivery = Delivery(
     login_handler=LoginHandler(
@@ -66,6 +70,7 @@ delivery = Delivery(
         user_uc=user_uc,
     ),
     receipt_split_handler=SplitHandler(
+        session=session_checker,
         receipt_split_uc=ReceiptSplitUseCase(
             user_uc=user_uc,
             receipt_uc=receipt_reader_uc,
@@ -75,6 +80,7 @@ delivery = Delivery(
         receipt_reader_uc=receipt_reader_uc,
     ),
     receipt_show_handler=ShowHandler(
+        session=session_checker,
         receipt_reader_uc=ReceiptReadUseCase(
             reader=receipt_storage,
         ),

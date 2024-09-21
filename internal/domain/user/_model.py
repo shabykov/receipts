@@ -16,7 +16,7 @@ class User(BaseModel):
         default_factory=now
     )
 
-    def key(self) -> str:
+    def id(self) -> str:
         return str(self.user_id)
 
 

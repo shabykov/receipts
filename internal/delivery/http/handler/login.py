@@ -3,8 +3,8 @@ import typing as t
 from flask import (
     url_for,
     Request,
+    session,
     redirect,
-    make_response,
     render_template,
 )
 from pydantic import ValidationError
@@ -46,20 +46,17 @@ class LoginHandler:
             )
 
             # set cookie
-            resp = make_response(
-                redirect(
-                    location=url_for(
-                        'login',
-                        success="authentication is successful"
-                    ),
-                )
+            session["user_id"] = user.user_id
+            return redirect(
+                location=url_for(
+                    'login',
+                    success="authentication is successful"
+                ),
             )
-            resp.set_cookie(
-                self.session_manager.key(),
-                value=self.session_manager.encode_key(user.key()),
-            )
-            return resp
 
         return redirect(
-            url_for('login', error="authentication is failed")
+            url_for(
+                'login',
+                error="authentication is failed"
+            )
         )

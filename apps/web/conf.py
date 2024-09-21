@@ -18,6 +18,7 @@ class Settings(BaseSettings, case_sensitive=False):
         env_file='.env',
         env_file_encoding='utf-8'
     )
+    secret_key: SecretStr
     telegram_bot_token: SecretStr
     web_port: int = Field(
         default=8080

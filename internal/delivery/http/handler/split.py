@@ -1,8 +1,9 @@
 import typing as t
 
-from flask import Request, render_template
+from flask import Request, render_template, redirect, url_for
 from pydantic import BaseModel, ValidationError
 
+from internal.delivery.http.handler.session import SessionChecker
 from internal.domain.receipt import ReceiptReadError
 from internal.domain.receipt.item import convert_to_uuid
 from internal.domain.split import splited_by
@@ -12,13 +13,21 @@ from internal.usecase.interface import IReceiptSplitUC, IReceiptReadUC
 class SplitHandler:
     def __init__(
             self,
+            session: SessionChecker,
             receipt_split_uc: IReceiptSplitUC,
             receipt_reader_uc: IReceiptReadUC,
     ):
+        self.session = session
         self.receipt_split_uc = receipt_split_uc
         self.receipt_reader_uc = receipt_reader_uc
 
-    def split(self, receipt_uuid: str, request: Request) -> str:
+    def split(self, receipt_uuid: str, request: Request):
+        user = self.session.check()
+        if not user:
+            redirect(
+                url_for('login', error="user is not authenticated")
+            )
+
         try:
             receipt = self.receipt_reader_uc.read(receipt_uuid)
         except ReceiptReadError as err:

@@ -42,6 +42,10 @@ class IReceiptSplitUC(ABC):
 
 class IUserReadUC(ABC):
     @abstractmethod
+    def get_by_id(self, user_id: int) -> t.Optional[User]:
+        raise NotImplementedError("method `.get_by_id()` must be implemented")
+
+    @abstractmethod
     def get_by_username(self, username: str) -> User:
         raise NotImplementedError("method `.get_by_username()` must be implemented")
 
