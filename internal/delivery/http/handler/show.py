@@ -1,5 +1,6 @@
 from flask import render_template
 
+from internal.domain.receipt import ReceiptReadError
 from internal.usecase.interface import IReceiptReadUC
 
 
@@ -10,9 +11,11 @@ class ShowHandler:
     ):
         self.receipt_reader_uc = receipt_reader_uc
 
-    def handle(self, receipt_uuid: str) -> str:
-        receipt, err = self.receipt_reader_uc.read(receipt_uuid)
-        if err is not None:
+    def show(self, receipt_uuid: str) -> str:
+
+        try:
+            receipt = self.receipt_reader_uc.read(receipt_uuid)
+        except ReceiptReadError as err:
             return render_template(
                 "receipt-err.html",
                 **{"receipt_uuid": receipt_uuid, "error": err}

@@ -1,18 +1,24 @@
 import os
-from flask import Flask
-from psycopg import connect
 from logging import getLogger
 
-from pkg.log import init_logging
-from internal.delivery.http.delivery import Delivery
-from internal.delivery.http.handler.show import ShowHandler
-from internal.delivery.http.handler.share import ShareHandler
-from internal.repository.receipt.storage.postgres.repository import Repository as ReceiptStorage
-from internal.repository.receipt_item.storage.postgres.repository import Repository as ReceiptItemStorage
-from internal.usecase.receipt.read import ReceiptReadUseCase
-from internal.usecase.receipt.share import ReceiptShareUseCase
+from flask import Flask
+from psycopg import connect
 
 from apps.web.conf import init_settings
+from internal.delivery.http.delivery import Delivery
+from internal.delivery.http.handler.login import LoginHandler
+from internal.delivery.http.handler.show import ShowHandler
+from internal.delivery.http.handler.split import SplitHandler
+from internal.repository.receipt.storage.postgres.repository import Repository as ReceiptStorage
+from internal.repository.receipt_item.storage.postgres.repository import Repository as ReceiptItemStorage
+from internal.repository.split.storage.memory.repository import Repository as SplitStorage
+from internal.repository.user.storage.memory.repository import Repository as UserStorage
+from internal.usecase.receipt.read import ReceiptReadUseCase
+from internal.usecase.receipt.split import ReceiptSplitUseCase
+from internal.usecase.user.read import UserReadUseCase
+from pkg.auth.telegram import TelegramAuth
+from pkg.log import init_logging
+from pkg.session.base64 import Base64SessionManager
 
 template_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 template_dir = os.path.join(template_dir, 'templates')
@@ -38,20 +44,42 @@ receipt_storage = ReceiptStorage(
     item_repo=receipt_item_storage,
 )
 
+user_storage = UserStorage()
+user_uc = UserReadUseCase(
+    reader=user_storage,
+    creator=user_storage
+)
+
+split_storage = SplitStorage()
+receipt_reader_uc = ReceiptReadUseCase(
+    reader=receipt_storage,
+)
+session_manager = Base64SessionManager(
+    session_key="session_id"
+)
 delivery = Delivery(
-    receipt_share_handler=ShareHandler(
-        receipt_share_uc=ReceiptShareUseCase(
-            updater=receipt_storage,
+    login_handler=LoginHandler(
+        auth=TelegramAuth(
+            bot_token=settings.telegram_bot_token
         ),
-        receipt_reader_uc=ReceiptReadUseCase(
-            reader=receipt_storage,
+        session_manager=session_manager,
+        user_uc=user_uc,
+    ),
+    receipt_split_handler=SplitHandler(
+        receipt_split_uc=ReceiptSplitUseCase(
+            user_uc=user_uc,
+            receipt_uc=receipt_reader_uc,
+            split_reader=split_storage,
+            split_creator=split_storage,
         ),
+        receipt_reader_uc=receipt_reader_uc,
     ),
     receipt_show_handler=ShowHandler(
         receipt_reader_uc=ReceiptReadUseCase(
             reader=receipt_storage,
         ),
     ),
+    session_manager=session_manager,
     flask_app=app,
     host=settings.web_host,
     port=settings.web_port,

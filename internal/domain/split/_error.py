@@ -1,0 +1,2 @@
+class SplitCreateError(Exception):
+    pass

@@ -5,7 +5,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, UUID4
 
 from internal.domain.receipt.item import ReceiptItem
-from pkg.datetime.now import now
+from pkg.datetime import now
 
 
 class Receipt(BaseModel):
@@ -42,7 +42,7 @@ class Receipt(BaseModel):
     created_at: datetime = Field(
         default_factory=now
     )
-    is_shared: bool = Field(
+    is_splitd: bool = Field(
         default=False
     )
 

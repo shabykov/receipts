@@ -6,7 +6,7 @@
     <table>
         <thead>
         <tr>
-            <h2>Contact info</h2>
+            <h2>Info</h2>
         </tr>
         </thead>
         <tbody>
@@ -26,6 +26,9 @@
     </table>
     <table>
         <thead>
+        <tr>
+            <h2>Items</h2>
+        </tr>
         <th>Product</th>
         <th>Qty</th>
         <th>Price</th>
@@ -41,7 +44,10 @@
         {% endfor %}
     </table>
     <table>
-        <tbody>
+        <thead>
+        <tr>
+            <h2>Sum</h2>
+        </tr>
         <tr>
             <th>Subtotal</th>
             <td>{{receipt.subtotal}}</td>
@@ -54,9 +60,9 @@
             <th>Total</th>
             <td>{{receipt.total}}</td>
         </tr>
-        </tbody>
+        </thead>
     </table>
-    <button type="button"><a href="{{ url_for('share', receipt_uuid=receipt_uuid) }}">Share</a></button>
+    <button type="button"><a href={{ url_for('split', receipt_uuid=receipt_uuid) }}>Split</a></button>
 </form>
 
 {% endblock %}

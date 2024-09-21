@@ -1,2 +1,0 @@
-class SharingCreateError(Exception):
-    pass

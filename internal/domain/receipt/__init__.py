@@ -3,7 +3,7 @@ from ._error import (
     ReceiptRecognizeError,
     ReceiptCreateError,
     ReceiptUpdateError,
-    ReceiptShareErr,
+    ReceiptSplitErr,
 )
 from ._interface import ICreator, IUpdater, IReader, IRecognizer
 from ._model import Receipt, ReceiptItem, new
@@ -20,5 +20,5 @@ __all__ = (
     'ReceiptReadError',
     'ReceiptCreateError',
     'ReceiptUpdateError',
-    'ReceiptShareErr',
+    'ReceiptSplitErr',
 )

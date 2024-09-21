@@ -14,5 +14,5 @@ class ReceiptReadError(Exception):
     pass
 
 
-class ReceiptShareErr(Exception):
+class ReceiptSplitErr(Exception):
     pass

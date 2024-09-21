@@ -1,8 +1,11 @@
+import typing as t
 import uuid
 from datetime import datetime
+
 from pydantic import BaseModel, Field, UUID4
 
-from pkg.datetime.now import now
+from internal.domain.user import User
+from pkg.datetime import now
 
 
 class ReceiptItem(BaseModel):
@@ -22,6 +25,8 @@ class ReceiptItem(BaseModel):
         default_factory=now
     )
 
+    split_by: t.List[User]
+
 
 def new(product: str, quantity: int, price: float) -> ReceiptItem:
     return ReceiptItem(
@@ -29,3 +34,13 @@ def new(product: str, quantity: int, price: float) -> ReceiptItem:
         quantity=quantity,
         price=price,
     )
+
+
+def convert_to_uuid(values: t.List[str]) -> t.List[UUID4]:
+    return [
+        UUID4(v) for v in values
+    ]
+
+
+def empty_items() -> t.List[UUID4]:
+    return []

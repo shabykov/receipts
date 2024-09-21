@@ -242,7 +242,8 @@ class Repository(ICreator, IUpdater, IReader):
                             product=row[1],
                             quantity=row[2],
                             price=row[3],
-                            created_at=row[4]
+                            created_at=row[4],
+                            split_by=[],
                         )
                     )
         except psycopg.errors.DatabaseError as e:

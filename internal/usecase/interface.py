@@ -1,3 +1,5 @@
+# Here are public interfaces which
+# are used as entrypoints of the application
 import typing as t
 from abc import ABC, abstractmethod
 
@@ -5,6 +7,7 @@ from pydantic import UUID4
 
 from internal.domain.image import Image
 from internal.domain.receipt import Receipt
+from internal.domain.split import Splits
 from internal.domain.user import User
 
 
@@ -25,8 +28,23 @@ class IReceiptReadUC(ABC):
         raise NotImplementedError("method `.read_many()` must be implemented")
 
 
-class IReceiptShareUC(ABC):
+class IReceiptSplitUC(ABC):
     @abstractmethod
-    def share(self, receipt: Receipt, with_user: User):
-        # public share interface
-        raise NotImplementedError("method `.share()` must be implemented")
+    def get(self, receipt_uuid: UUID4) -> t.Optional[Splits]:
+        # public get interface
+        raise NotImplementedError("method `.get()` must be implemented")
+
+    @abstractmethod
+    def create(self, username: str, receipt_uuid: UUID4, items: t.List[str]) -> Splits:
+        # public split interface
+        raise NotImplementedError("method `.create()` must be implemented")
+
+
+class IUserReadUC(ABC):
+    @abstractmethod
+    def get_by_username(self, username: str) -> User:
+        raise NotImplementedError("method `.get_by_username()` must be implemented")
+
+    @abstractmethod
+    def get_or_create(self, user: User) -> User:
+        raise NotImplementedError("method `.get_or_create()` must be implemented")

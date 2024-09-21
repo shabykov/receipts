@@ -12,5 +12,9 @@ class ICreator(ABC):
 
 class IReader(ABC):
     @abstractmethod
+    def read_by_id(self, user_id: int) -> t.Optional[User]:
+        raise NotImplementedError("method `.read_by_id()` must be implemented")
+
+    @abstractmethod
     def read_by_username(self, username: str) -> t.Optional[User]:
         raise NotImplementedError("method `.read_by_username()` must be implemented")
