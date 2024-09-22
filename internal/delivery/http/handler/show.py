@@ -17,8 +17,12 @@ class ShowHandler:
     def show(self, receipt_uuid: str):
         user = self.session.check()
         if not user:
-            redirect(
-                url_for('login', error="user is not authenticated")
+            return redirect(
+                url_for(
+                    endpoint='login',
+                    receipt_uuid=receipt_uuid,
+                    error="user is not authenticated"
+                )
             )
 
         try:

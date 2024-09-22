@@ -5,8 +5,7 @@ from pydantic import BaseModel, ValidationError
 
 from internal.delivery.http.handler.session import SessionChecker
 from internal.domain.receipt import ReceiptReadError
-from internal.domain.receipt.item import convert_to_uuid
-from internal.domain.split import splited_by
+from internal.domain.split import splited_by, SplitReadError, SplitCreateError
 from internal.usecase.interface import IReceiptSplitUC, IReceiptReadUC
 
 
@@ -24,8 +23,12 @@ class SplitHandler:
     def split(self, receipt_uuid: str, request: Request):
         user = self.session.check()
         if not user:
-            redirect(
-                url_for('login', error="user is not authenticated")
+            return redirect(
+                url_for(
+                    endpoint='login',
+                    receipt_uuid=receipt_uuid,
+                    error="user is not authenticated"
+                )
             )
 
         try:
@@ -46,23 +49,26 @@ class SplitHandler:
                 )
 
             try:
-                self.receipt_split_uc.create(
-                    receipt_uuid,
-                    convert_to_uuid(param.receipt_items),
-                    param.username,
+                splits = self.receipt_split_uc.create(
+                    user,
+                    receipt,
+                    param.receipt_items,
                 )
-            except Exception as err:
+
+            except SplitCreateError as err:
+                return render_template(
+                    "receipt-split.html",
+                    **{"receipt": receipt, "error": err}
+                )
+        else:
+            try:
+                splits = self.receipt_split_uc.get(receipt_uuid)
+            except SplitReadError as err:
                 return render_template(
                     "receipt-split.html",
                     **{"receipt": receipt, "error": err}
                 )
 
-            return render_template(
-                "receipt-split.html",
-                **{"receipt": receipt, "error": None}
-            )
-
-        splits = self.receipt_split_uc.get(receipt_uuid)
         if splits:
             splited_by(receipt, splits)
 
@@ -73,7 +79,7 @@ class SplitHandler:
 
 
 class Body(BaseModel):
-    receipt_items: str
+    receipt_items: t.List[str]
 
 
 def validate(request: Request) -> (t.Optional[Body], str):
@@ -83,7 +89,7 @@ def validate(request: Request) -> (t.Optional[Body], str):
 
     try:
         body = Body(
-            receipt_items=request.form.getlist("receipt_items")
+            receipt_items=receipt_items
         )
     except ValidationError as err:
         return None, str(err)

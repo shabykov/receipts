@@ -12,8 +12,8 @@ from internal.delivery.http.handler.show import ShowHandler
 from internal.delivery.http.handler.split import SplitHandler
 from internal.repository.receipt.storage.postgres.repository import Repository as ReceiptStorage
 from internal.repository.receipt_item.storage.postgres.repository import Repository as ReceiptItemStorage
-from internal.repository.split.storage.memory.repository import Repository as SplitStorage
-from internal.repository.user.storage.memory.repository import Repository as UserStorage
+from internal.repository.split.storage.postgres.repository import Repository as SplitStorage
+from internal.repository.user.storage.postgres.repository import Repository as UserStorage
 from internal.usecase.receipt.read import ReceiptReadUseCase
 from internal.usecase.receipt.split import ReceiptSplitUseCase
 from internal.usecase.user.read import UserReadUseCase
@@ -47,13 +47,17 @@ receipt_storage = ReceiptStorage(
     item_repo=receipt_item_storage,
 )
 
-user_storage = UserStorage()
+user_storage = UserStorage(
+    conn=postgresql_conn
+)
 user_uc = UserReadUseCase(
     reader=user_storage,
     creator=user_storage
 )
 
-split_storage = SplitStorage()
+split_storage = SplitStorage(
+    conn=postgresql_conn
+)
 receipt_reader_uc = ReceiptReadUseCase(
     reader=receipt_storage,
 )

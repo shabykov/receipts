@@ -2,6 +2,14 @@
 
 {% block content %}
 
+<body>
+
+{% if error != None %}
+    {{error}}
+{% endif %}
+
+</body>
+
 <form method="post">
     <table>
         <thead>
@@ -11,6 +19,7 @@
         <th>Product</th>
         <th>Qty</th>
         <th>Price</th>
+        <th>Splited</th>
         <th>Choice</th>
         </thead>
         <tbody>
@@ -19,6 +28,13 @@
             <td>{{item.product}}</td>
             <td>{{item.quantity}}</td>
             <td>{{item.price}}</td>
+            <td>
+                {% for user in item.split_by %}
+                <ul>
+                    <li>{{ user.username }}</li>
+                </ul>
+                {% endfor %}
+            </td>
             <td><input type="checkbox" name="receipt_items" value="{{ item.uuid }}"></td>
         </tr>
         </tbody>

@@ -3,6 +3,8 @@ from logging import getLogger
 
 from pydantic import UUID4
 
+from internal.domain.user import User
+from internal.domain.receipt import Receipt
 from internal.domain.split import (
     new_split,
     new_splits,
@@ -39,13 +41,16 @@ class ReceiptSplitUseCase(IReceiptSplitUC):
 
         return new_splits(splits)
 
-    def create(self, with_user: str, receipt_uuid: UUID4, receipt_items: t.List[str]) -> Splits:
-        user = self._user_uc.get_by_username(with_user)
-        receipt = self._receipt_uc.read(receipt_uuid)
+    def create(
+            self,
+            with_user: User,
+            receipt: Receipt,
+            receipt_items: t.List[str]
+    ) -> Splits:
         return new_splits(
             self._split_creator.create(
                 [
-                    new_split(user, receipt, UUID4(receipt_item))
+                    new_split(with_user, receipt, receipt_item)
                     for receipt_item in receipt_items
                 ],
             )

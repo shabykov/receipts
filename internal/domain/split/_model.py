@@ -24,11 +24,11 @@ class Split(BaseModel):
     )
 
 
-def new_split(user: User, receipt: Receipt, receipt_item_id: UUID4) -> Split:
+def new_split(user: User, receipt: Receipt, receipt_item_id: str) -> Split:
     return Split(
         user=user,
         receipt=receipt,
-        receipt_item=receipt_item_id
+        receipt_item_id=receipt_item_id
     )
 
 

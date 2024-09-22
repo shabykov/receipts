@@ -14,5 +14,5 @@ class IReader(ABC):
 
 class ICreator(ABC):
     @abstractmethod
-    def create(self, splits: t.List[Split]):
+    def create(self, splits: t.List[Split]) -> t.List[Split]:
         raise NotImplementedError("method `.create()` must be implemented")

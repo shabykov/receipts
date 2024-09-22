@@ -29,6 +29,7 @@ class LoginHandler:
     def login(self, request: Request) -> t.Any:
         return render_template(
             'login.html',
+            receipt_uuid=request.args.get("receipt_uuid"),
             success_message=request.args.get("success"),
             error_message=request.args.get("error")
         )
@@ -37,7 +38,13 @@ class LoginHandler:
         try:
             data = AuthData.model_validate(request.args.to_dict())
         except ValidationError as err:
-            return redirect(url_for('login', error=str(err)))
+            return redirect(
+                url_for(
+                    endpoint='login',
+                    error=str(err),
+                    receipt_uuid=request.args.get("receipt_uuid"),
+                )
+            )
 
         if self.auth.authenticate(data):
             # create user
@@ -47,16 +54,27 @@ class LoginHandler:
 
             # set cookie
             session["user_id"] = user.user_id
+
+            if request.args.get("receipt_uuid"):
+                return redirect(
+                    location=url_for(
+                        endpoint="show",
+                        receipt_uuid=request.args.get("receipt_uuid")
+                    )
+                )
+
             return redirect(
                 location=url_for(
                     'login',
-                    success="authentication is successful"
+                    success="authentication is successful",
+                    receipt_uuid=request.args.get("receipt_uuid")
                 ),
             )
 
         return redirect(
             url_for(
                 'login',
-                error="authentication is failed"
+                error="authentication is failed",
+                receipt_uuid=request.args.get("receipt_uuid")
             )
         )
