@@ -1,7 +1,6 @@
 from flask import Flask, request
 from pydantic import BaseModel, Field
 
-from pkg.session import SessionManager
 from .handler.login import LoginHandler
 from .handler.show import ShowHandler
 from .handler.split import SplitHandler
@@ -22,7 +21,6 @@ class Delivery:
             login_handler: LoginHandler,
             receipt_show_handler: ShowHandler,
             receipt_split_handler: SplitHandler,
-            session_manager: SessionManager,
             flask_app: Flask,
             host: str,
             port: int = 8080,
@@ -30,7 +28,6 @@ class Delivery:
         self.login_handler = login_handler
         self.receipt_show_handler = receipt_show_handler
         self.receipt_split_handler = receipt_split_handler
-        self.session_manager = session_manager
         self.flask = flask_app
         self.host = host
         self.port = port

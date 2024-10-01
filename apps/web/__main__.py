@@ -1,4 +1,3 @@
-import os
 from logging import getLogger
 
 from flask import Flask
@@ -19,10 +18,6 @@ from internal.usecase.user.read import UserReadUseCase
 from internal.usecase.user.session import UserSessionUseCase
 from pkg.auth.telegram import TelegramAuth
 from pkg.log import init_logging
-from pkg.session.base64 import Base64SessionManager
-
-template_dir = os.path.dirname(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-template_dir = os.path.join(template_dir, 'templates')
 
 app = Flask(__name__, template_folder="../../internal/delivery/http/handler/templates")
 
@@ -61,7 +56,6 @@ split_storage = SplitStorage(
 receipt_reader_uc = ReceiptReadUseCase(
     reader=receipt_storage,
 )
-session_manager = Base64SessionManager()
 user_session_uc = UserSessionUseCase(
     user_uc=user_uc
 )
@@ -70,7 +64,6 @@ delivery = Delivery(
         auth=TelegramAuth(
             bot_token=settings.telegram_bot_token
         ),
-        session_manager=session_manager,
         user_uc=user_uc,
     ),
     receipt_split_handler=SplitHandler(
@@ -89,7 +82,6 @@ delivery = Delivery(
             reader=receipt_storage,
         ),
     ),
-    session_manager=session_manager,
     flask_app=app,
     host=settings.web_host,
     port=settings.web_port,

@@ -12,18 +12,15 @@ from pydantic import ValidationError
 from internal.domain.user import new
 from internal.usecase.interface import IUserReadUC
 from pkg.auth.telegram import TelegramAuth, AuthData
-from pkg.session import SessionManager
 
 
 class LoginHandler:
     def __init__(
             self,
             auth: TelegramAuth,
-            session_manager: SessionManager,
             user_uc: IUserReadUC,
     ):
         self.auth = auth
-        self.session_manager = session_manager
         self.user_uc = user_uc
 
     def login(self, request: Request) -> t.Any:
