@@ -1,21 +1,20 @@
 from flask import render_template, redirect, url_for
 
-from internal.delivery.http.handler.session import SessionChecker
 from internal.domain.receipt import ReceiptReadError
-from internal.usecase.interface import IReceiptReadUC
+from internal.usecase.interface import IReceiptReadUC, IUserSessionUC
 
 
 class ShowHandler:
     def __init__(
             self,
-            session: SessionChecker,
+            user_session_uc: IUserSessionUC,
             receipt_reader_uc: IReceiptReadUC,
     ):
-        self.session = session
+        self.user_session_uc = user_session_uc
         self.receipt_reader_uc = receipt_reader_uc
 
     def show(self, receipt_uuid: str):
-        user = self.session.check()
+        user = self.user_session_uc.check()
         if not user:
             return redirect(
                 url_for(

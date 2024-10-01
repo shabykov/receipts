@@ -7,7 +7,6 @@ from psycopg import connect
 from apps.web.conf import init_settings
 from internal.delivery.http.delivery import Delivery
 from internal.delivery.http.handler.login import LoginHandler
-from internal.delivery.http.handler.session import SessionChecker
 from internal.delivery.http.handler.show import ShowHandler
 from internal.delivery.http.handler.split import SplitHandler
 from internal.repository.receipt.storage.postgres.repository import Repository as ReceiptStorage
@@ -17,6 +16,7 @@ from internal.repository.user.storage.postgres.repository import Repository as U
 from internal.usecase.receipt.read import ReceiptReadUseCase
 from internal.usecase.receipt.split import ReceiptSplitUseCase
 from internal.usecase.user.read import UserReadUseCase
+from internal.usecase.user.session import UserSessionUseCase
 from pkg.auth.telegram import TelegramAuth
 from pkg.log import init_logging
 from pkg.session.base64 import Base64SessionManager
@@ -62,7 +62,7 @@ receipt_reader_uc = ReceiptReadUseCase(
     reader=receipt_storage,
 )
 session_manager = Base64SessionManager()
-session_checker = SessionChecker(
+user_session_uc = UserSessionUseCase(
     user_uc=user_uc
 )
 delivery = Delivery(
@@ -74,7 +74,7 @@ delivery = Delivery(
         user_uc=user_uc,
     ),
     receipt_split_handler=SplitHandler(
-        session=session_checker,
+        user_session_uc=user_session_uc,
         receipt_split_uc=ReceiptSplitUseCase(
             user_uc=user_uc,
             receipt_uc=receipt_reader_uc,
@@ -84,7 +84,7 @@ delivery = Delivery(
         receipt_reader_uc=receipt_reader_uc,
     ),
     receipt_show_handler=ShowHandler(
-        session=session_checker,
+        user_session_uc=user_session_uc,
         receipt_reader_uc=ReceiptReadUseCase(
             reader=receipt_storage,
         ),

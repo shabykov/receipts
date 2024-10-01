@@ -52,3 +52,9 @@ class IUserReadUC(ABC):
     @abstractmethod
     def get_or_create(self, user: User) -> User:
         raise NotImplementedError("method `.get_or_create()` must be implemented")
+
+
+class IUserSessionUC(ABC):
+    @abstractmethod
+    def check(self) -> t.Optional[User]:
+        raise NotImplementedError("method `.check()` must be implemented")

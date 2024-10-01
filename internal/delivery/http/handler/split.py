@@ -3,25 +3,24 @@ import typing as t
 from flask import Request, render_template, redirect, url_for
 from pydantic import BaseModel, ValidationError
 
-from internal.delivery.http.handler.session import SessionChecker
 from internal.domain.receipt import ReceiptReadError
 from internal.domain.split import splited_by, SplitReadError, SplitCreateError
-from internal.usecase.interface import IReceiptSplitUC, IReceiptReadUC
+from internal.usecase.interface import IReceiptSplitUC, IReceiptReadUC, IUserSessionUC
 
 
 class SplitHandler:
     def __init__(
             self,
-            session: SessionChecker,
+            user_session_uc: IUserSessionUC,
             receipt_split_uc: IReceiptSplitUC,
             receipt_reader_uc: IReceiptReadUC,
     ):
-        self.session = session
+        self.user_session_uc = user_session_uc
         self.receipt_split_uc = receipt_split_uc
         self.receipt_reader_uc = receipt_reader_uc
 
     def split(self, receipt_uuid: str, request: Request):
-        user = self.session.check()
+        user = self.user_session_uc.check()
         if not user:
             return redirect(
                 url_for(
