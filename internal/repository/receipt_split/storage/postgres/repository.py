@@ -8,7 +8,7 @@ from internal.domain.receipt.split import ICreator, IReader, Split, SplitCreateE
 from internal.domain.user import User
 
 CREATE_SCHEMA_SQL = """
-    CREATE TABLE IF NOT EXISTS tbl_split (
+    CREATE TABLE IF NOT EXISTS tbl_receipt_split (
         username  varchar(255),
         receipt_uuid varchar(255),
         receipt_item_uuid varchar(255),
@@ -18,7 +18,7 @@ CREATE_SCHEMA_SQL = """
 """
 
 INSERT_SQL = """
-    INSERT INTO tbl_split (
+    INSERT INTO tbl_receipt_split (
         username,
         receipt_uuid,
         receipt_item_uuid,
@@ -35,7 +35,7 @@ SELECT_ITEMS_SQL = """
         receipt_uuid,
         receipt_item_uuid,
         created_at
-    FROM tbl_split
+    FROM tbl_receipt_split
     WHERE receipt_uuid=%(receipt_uuid)s;
 """
 
