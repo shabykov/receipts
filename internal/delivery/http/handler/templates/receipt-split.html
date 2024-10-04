@@ -10,37 +10,38 @@
 
 </body>
 
-<form method="post">
-    <table>
-        <thead>
-        <tr>
-            <h2>Items</h2>
-        </tr>
-        <th>Product</th>
-        <th>Qty</th>
-        <th>Price</th>
-        <th>Splited</th>
-        <th>Choice</th>
-        </thead>
-        <tbody>
-        {% for item in receipt.items %}
-        <tr>
-            <td>{{item.product}}</td>
-            <td>{{item.quantity}}</td>
-            <td>{{item.price}}</td>
-            <td>
-                {% for user in item.split_by %}
-                <ul>
-                    <li>{{ user.username }}</li>
-                </ul>
-                {% endfor %}
-            </td>
-            <td><input type="checkbox" name="receipt_items" value="{{ item.uuid }}"></td>
-        </tr>
-        </tbody>
-        {% endfor %}
-    </table>
-    <button type="submit">Submit</button>
-</form>
-
+{% if receipt != None %}
+    <form method="post">
+        <table>
+            <thead>
+            <tr>
+                <h2>Items</h2>
+            </tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Splited</th>
+            <th>Choice</th>
+            </thead>
+            <tbody>
+            {% for item in receipt.items %}
+            <tr>
+                <td>{{item.product}}</td>
+                <td>{{item.quantity}}</td>
+                <td>{{item.price}}</td>
+                <td>
+                    {% for username in item.split_by %}
+                    <ul>
+                        <li>{{ username }}</li>
+                    </ul>
+                    {% endfor %}
+                </td>
+                <td><input type="checkbox" name="receipt_items" value="{{ item.uuid }}"></td>
+            </tr>
+            </tbody>
+            {% endfor %}
+        </table>
+        <button type="submit">Submit</button>
+    </form>
+{% endif %}
 {% endblock %}

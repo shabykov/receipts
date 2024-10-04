@@ -4,7 +4,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, UUID4
 
-from internal.domain.user import User
 from pkg.datetime import now
 
 
@@ -25,7 +24,7 @@ class ReceiptItem(BaseModel):
         default_factory=now
     )
 
-    split_by: t.List[User]
+    split_by: t.List[str]
 
 
 def new(product: str, quantity: int, price: float) -> ReceiptItem:

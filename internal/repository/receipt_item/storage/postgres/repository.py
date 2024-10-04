@@ -93,6 +93,7 @@ SELECT_RECEIPT_ITEMS_SQL = """
 class Repository(ICreator, IUpdater, IReader):
     def __init__(self, conn: psycopg.Connection):
         self._conn = conn
+        self.init_schema()
 
     def init_schema(self):
         with self._conn.cursor() as cur:

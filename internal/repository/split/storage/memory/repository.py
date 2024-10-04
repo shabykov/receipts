@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from pydantic import UUID4
 
-from internal.domain.split import IReader, ICreator, Split
+from internal.domain.receipt.split import IReader, ICreator, Split
 
 
 class Repository(IReader, ICreator):

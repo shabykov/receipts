@@ -4,52 +4,39 @@ import psycopg
 from pydantic import UUID4
 
 from internal.domain.receipt import Receipt
-from internal.domain.split import ICreator, IReader, Split, SplitCreateError, SplitReadError
+from internal.domain.receipt.split import ICreator, IReader, Split, SplitCreateError, SplitReadError
 from internal.domain.user import User
 
 CREATE_SCHEMA_SQL = """
     CREATE TABLE IF NOT EXISTS tbl_split (
-        user_id  integer,
+        username  varchar(255),
         receipt_uuid varchar(255),
         receipt_item_uuid varchar(255),
         created_at timestamp without time zone,
-        UNIQUE(user_id, receipt_uuid, receipt_item_uuid)
+        UNIQUE(username, receipt_uuid, receipt_item_uuid)
     );
 """
 
 INSERT_SQL = """
     INSERT INTO tbl_split (
-        user_id,
+        username,
         receipt_uuid,
         receipt_item_uuid,
         created_at
     )
     VALUES (%s, %s, %s, %s)
-    ON CONFLICT (user_id, receipt_uuid, receipt_item_uuid)
+    ON CONFLICT (username, receipt_uuid, receipt_item_uuid)
     DO NOTHING;
 """
 
 SELECT_ITEMS_SQL = """
     SELECT
-        u.user_id,
-        u.username,
-        u.created_at,
-        r.user_id,
-        r.uuid,
-        r.store_name,
-        r.store_addr,
-        r.date,
-        r.time,
-        r.subtotal,
-        r.tips,
-        r.total,
-        r.created_at,
-        s.receipt_item_uuid,
-        s.created_at
-    FROM tbl_split as s
-    JOIN tbl_user as u ON (u.user_id = s.user_id)
-    JOIN tbl_receipt as r ON (r.uuid = s.receipt_uuid)
-    WHERE s.receipt_uuid=%(receipt_uuid)s;
+        username,
+        receipt_uuid,
+        receipt_item_uuid,
+        created_at
+    FROM tbl_split
+    WHERE receipt_uuid=%(receipt_uuid)s;
 """
 
 
@@ -77,26 +64,10 @@ class Repository(ICreator, IReader):
                 for row in cur:
                     items.append(
                         Split(
-                            user=User(
-                                user_id=row[0],
-                                username=row[1],
-                                created_at=row[2],
-                            ),
-                            receipt=Receipt(
-                                user_id=row[3],
-                                uuid=row[4],
-                                store_name=row[5],
-                                store_addr=row[6],
-                                date=row[7],
-                                time=row[8],
-                                subtotal=row[9],
-                                tips=row[10],
-                                total=row[11],
-                                created_at=row[12],
-                                items=[],
-                            ),
-                            receipt_item_id=row[13],
-                            created_at=row[14],
+                            username=row[0],
+                            receipt_uuid=row[1],
+                            receipt_item_id=row[2],
+                            created_at=row[3],
                         )
                     )
         except psycopg.errors.DatabaseError as e:
@@ -111,8 +82,8 @@ class Repository(ICreator, IReader):
                     query=INSERT_SQL,
                     params_seq=[
                         (
-                            split.user.user_id,
-                            split.receipt.uuid,
+                            split.username,
+                            split.receipt_uuid,
                             split.receipt_item_id,
                             split.created_at
                         ) for split in splits

@@ -16,3 +16,7 @@ class ReceiptReadError(Exception):
 
 class ReceiptSplitErr(Exception):
     pass
+
+
+class ReceiptItemsAlreadySplited(Exception):
+    pass

@@ -3,9 +3,8 @@ import typing as t
 from flask import Request, render_template, redirect, url_for
 from pydantic import BaseModel, ValidationError
 
-from internal.domain.receipt import ReceiptReadError
-from internal.domain.split import splited_by, SplitReadError, SplitCreateError
-from internal.usecase.interface import IReceiptSplitUC, IReceiptReadUC, IUserSessionUC
+from internal.domain.receipt.split import SplitReadError, SplitCreateError
+from internal.usecase.interface import IReceiptSplitUC, IUserSessionUC
 
 
 class SplitHandler:
@@ -13,11 +12,9 @@ class SplitHandler:
             self,
             user_session_uc: IUserSessionUC,
             receipt_split_uc: IReceiptSplitUC,
-            receipt_reader_uc: IReceiptReadUC,
     ):
         self.user_session_uc = user_session_uc
         self.receipt_split_uc = receipt_split_uc
-        self.receipt_reader_uc = receipt_reader_uc
 
     def split(self, receipt_uuid: str, request: Request):
         user = self.user_session_uc.check()
@@ -30,46 +27,35 @@ class SplitHandler:
                 )
             )
 
-        try:
-            receipt = self.receipt_reader_uc.read(receipt_uuid)
-        except ReceiptReadError as err:
-            return render_template(
-                "receipt-err.html",
-                **{"receipt": None, "error": err}
-            )
-
         if request.method == "POST":
             # TODO: validate CSRF token, validate input
             param, err = validate(request)
             if err != "":
                 return render_template(
                     "receipt-split.html",
-                    **{"receipt": receipt, "err": err}
+                    **{"receipt": None, "err": err}
                 )
 
             try:
-                splits = self.receipt_split_uc.create(
+                receipt = self.receipt_split_uc.create(
                     user,
-                    receipt,
+                    receipt_uuid,
                     param.receipt_items,
                 )
 
             except SplitCreateError as err:
                 return render_template(
                     "receipt-split.html",
-                    **{"receipt": receipt, "error": err}
+                    **{"receipt": None, "error": err}
                 )
         else:
             try:
-                splits = self.receipt_split_uc.get(receipt_uuid)
+                receipt = self.receipt_split_uc.get(receipt_uuid)
             except SplitReadError as err:
                 return render_template(
                     "receipt-split.html",
-                    **{"receipt": receipt, "error": err}
+                    **{"receipt": None, "error": err}
                 )
-
-        if splits:
-            splited_by(receipt, splits)
 
         return render_template(
             "receipt-split.html",

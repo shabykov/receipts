@@ -61,6 +61,8 @@ user_session_uc = UserSessionUseCase(
 )
 delivery = Delivery(
     login_handler=LoginHandler(
+        domain=settings.domain,
+        bot_name=settings.bot_name,
         auth=TelegramAuth(
             bot_token=settings.telegram_bot_token
         ),
@@ -74,7 +76,6 @@ delivery = Delivery(
             split_reader=split_storage,
             split_creator=split_storage,
         ),
-        receipt_reader_uc=receipt_reader_uc,
     ),
     receipt_show_handler=ShowHandler(
         user_session_uc=user_session_uc,

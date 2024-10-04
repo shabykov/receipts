@@ -17,15 +17,21 @@ from pkg.auth.telegram import TelegramAuth, AuthData
 class LoginHandler:
     def __init__(
             self,
+            domain: str,
+            bot_name: str,
             auth: TelegramAuth,
             user_uc: IUserReadUC,
     ):
+        self.domain = domain
+        self.bot_name = bot_name
         self.auth = auth
         self.user_uc = user_uc
 
     def login(self, request: Request) -> t.Any:
         return render_template(
             'login.html',
+            domain=self.domain,
+            bot_name=self.bot_name,
             receipt_uuid=request.args.get("receipt_uuid"),
             success_message=request.args.get("success"),
             error_message=request.args.get("error")

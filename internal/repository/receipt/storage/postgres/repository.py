@@ -125,6 +125,7 @@ class Repository(ICreator, IUpdater, IReader):
     def __init__(self, conn: psycopg.Connection, item_repo: ItemRepository):
         self._conn = conn
         self._item_repo = item_repo
+        self.init_schema()
 
     def init_schema(self):
         with self._conn.cursor() as cur:
