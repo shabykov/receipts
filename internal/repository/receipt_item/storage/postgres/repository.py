@@ -4,16 +4,16 @@ from logging import getLogger
 import psycopg
 from pydantic import UUID4
 
-from internal.domain.receipt.item import (
-    ReceiptItem,
-    ICreator,
-    IUpdater,
-    IReader,
-)
+from internal.domain.receipt.item import ReceiptItem
 from internal.domain.receipt.item import (
     ReceiptItemCreateError,
     ReceiptItemUpdateError,
     ReceiptItemReadError,
+)
+from internal.usecase.ports.receipt.item import (
+    ICreator,
+    IUpdater,
+    IReader,
 )
 
 logger = getLogger("receipt_item.storage.postgres")

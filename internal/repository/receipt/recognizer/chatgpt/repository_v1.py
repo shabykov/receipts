@@ -2,7 +2,6 @@
 used this example
 https://medium.com/@foxmike/extracting-structured-data-from-images-using-openais-gpt-4-vision-and-jason-liu-s-instructor-ec7f54ee0a91
 """
-import typing as t
 from logging import getLogger
 
 import instructor
@@ -10,14 +9,14 @@ from openai import OpenAI
 
 from internal.domain.image import (
     Image,
-    ImageExtractor,
     ImageExtractError
 )
 from internal.domain.receipt import (
     Receipt,
-    IRecognizer,
     ReceiptRecognizeError,
 )
+from internal.usecase.ports.image import ImageExtractor
+from internal.usecase.ports.receipt import IRecognizer
 from .dto import convert, ReceiptDTO
 
 logger = getLogger("receipt.recognizer.catgpt")

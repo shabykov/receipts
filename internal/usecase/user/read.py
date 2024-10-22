@@ -1,11 +1,14 @@
 import typing as t
+
 from internal.domain.user import (
     User,
-    IReader,
-    ICreator,
     new_user_by_username,
 )
 from internal.usecase.interface import IUserReadUC
+from internal.usecase.ports.user import (
+    IReader,
+    ICreator,
+)
 
 
 class UserReadUseCase(IUserReadUC):

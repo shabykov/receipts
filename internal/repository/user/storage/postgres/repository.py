@@ -2,7 +2,8 @@ import typing as t
 
 import psycopg
 
-from internal.domain.user import IReader, ICreator, User, UserCreateError, UserReadError
+from internal.domain.user import User, UserCreateError, UserReadError
+from internal.usecase.ports.user import IReader, ICreator
 
 CREATE_SCHEMA_SQL = """
     CREATE TABLE IF NOT EXISTS tbl_user (

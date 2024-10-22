@@ -4,16 +4,16 @@ from logging import getLogger
 from pydantic import UUID4
 
 from internal.domain.receipt import Receipt
-from internal.domain.receipt.split import (
-    new_splits,
-    IReader as ISplitReader,
-    ICreator as ISplitCreator,
-)
+from internal.domain.receipt.split import new_splits
 from internal.domain.user import User
 from internal.usecase.interface import (
     IUserReadUC,
     IReceiptReadUC,
     IReceiptSplitUC,
+)
+from internal.usecase.ports.receipt.split import (
+    IReader,
+    ICreator,
 )
 
 logger = getLogger("receipt.split")
@@ -24,8 +24,8 @@ class ReceiptSplitUseCase(IReceiptSplitUC):
             self,
             user_uc: IUserReadUC,
             receipt_uc: IReceiptReadUC,
-            split_reader: ISplitReader,
-            split_creator: ISplitCreator,
+            split_reader: IReader,
+            split_creator: ICreator,
     ):
         self._user_uc = user_uc
         self._receipt_uc = receipt_uc

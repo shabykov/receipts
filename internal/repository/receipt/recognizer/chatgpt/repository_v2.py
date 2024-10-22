@@ -11,9 +11,9 @@ from openai import OpenAI
 from internal.domain.image import Image
 from internal.domain.receipt import (
     Receipt,
-    IRecognizer,
     ReceiptRecognizeError,
 )
+from internal.usecase.ports.receipt import IRecognizer
 from .dto import convert, ReceiptDTO
 
 logger = getLogger("receipt.recognizer.catgpt")

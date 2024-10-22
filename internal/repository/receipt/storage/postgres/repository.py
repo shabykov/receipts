@@ -6,9 +6,6 @@ from pydantic import UUID4
 
 from internal.domain.receipt import (
     Receipt,
-    ICreator,
-    IUpdater,
-    IReader,
     ReceiptReadError,
     ReceiptCreateError,
     ReceiptUpdateError,
@@ -20,6 +17,11 @@ from internal.domain.receipt.item import (
 )
 from internal.repository.receipt_item.storage.postgres.repository import (
     Repository as ItemRepository
+)
+from internal.usecase.ports.receipt import (
+    ICreator,
+    IUpdater,
+    IReader,
 )
 
 logger = getLogger("receipt.storge.postgres")

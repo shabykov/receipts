@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import UUID4
 
-from internal.domain.receipt.split._model import Split
+from internal.domain.receipt.split import Split
 
 
 class IReader(ABC):

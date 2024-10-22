@@ -3,9 +3,8 @@ import typing as t
 import psycopg
 from pydantic import UUID4
 
-from internal.domain.receipt import Receipt
-from internal.domain.receipt.split import ICreator, IReader, Split, SplitCreateError, SplitReadError
-from internal.domain.user import User
+from internal.domain.receipt.split import Split, SplitCreateError, SplitReadError
+from internal.usecase.ports.receipt.split import ICreator, IReader
 
 CREATE_SCHEMA_SQL = """
     CREATE TABLE IF NOT EXISTS tbl_receipt_split (

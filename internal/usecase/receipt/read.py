@@ -2,8 +2,9 @@ import typing as t
 
 from pydantic import UUID4
 
-from internal.domain.receipt import Receipt, IReader
+from internal.domain.receipt import Receipt
 from internal.usecase.interface import IReceiptReadUC
+from internal.usecase.ports.receipt import IReader
 
 
 class ReceiptReadUseCase(IReceiptReadUC):

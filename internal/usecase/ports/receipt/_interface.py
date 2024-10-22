@@ -1,8 +1,9 @@
 import typing as t
 from abc import ABC, abstractmethod
 
+from pydantic import UUID4
 from internal.domain.image import Image
-from internal.domain.receipt._model import Receipt, UUID4
+from internal.domain.receipt import Receipt
 
 
 class ICreator(ABC):

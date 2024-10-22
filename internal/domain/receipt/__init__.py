@@ -4,9 +4,8 @@ from ._error import (
     ReceiptCreateError,
     ReceiptUpdateError,
     ReceiptSplitErr,
-ReceiptItemsAlreadySplited,
+    ReceiptItemsAlreadySplited,
 )
-from ._interface import ICreator, IUpdater, IReader, IRecognizer
 from ._model import Receipt, ReceiptItem, new
 
 __all__ = (
@@ -14,10 +13,6 @@ __all__ = (
     'ReceiptItem',
     'Receipt',
     'ReceiptRecognizeError',
-    'ICreator',
-    'IUpdater',
-    'IReader',
-    'IRecognizer',
     'ReceiptReadError',
     'ReceiptCreateError',
     'ReceiptUpdateError',
