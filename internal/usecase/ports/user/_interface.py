@@ -1,7 +1,7 @@
 import typing as t
 from abc import ABC, abstractmethod
 
-from internal.domain.user._model import User
+from internal.domain.user import User
 
 
 class ICreator(ABC):
