@@ -18,7 +18,7 @@ from internal.domain.receipt.item import (
 from internal.repository.receipt_item.storage.postgres.repository import (
     Repository as ItemRepository
 )
-from internal.usecase.ports.receipt import (
+from internal.usecase.adapters.receipt import (
     ICreator,
     IUpdater,
     IReader,

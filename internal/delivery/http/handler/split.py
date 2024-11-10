@@ -1,7 +1,7 @@
 import typing as t
 
 from flask import Request, render_template, redirect, url_for
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, ValidationError, UUID4
 
 from internal.domain.receipt import ReceiptReadError
 from internal.domain.receipt.item import ReceiptItemSplitError
@@ -66,7 +66,7 @@ class SplitHandler:
 
 
 class Body(BaseModel):
-    receipt_items: t.List[str]
+    receipt_items: t.List[UUID4]
 
 
 def validate(request: Request) -> (t.Optional[Body], str):

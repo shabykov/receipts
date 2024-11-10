@@ -5,7 +5,7 @@ from internal.domain.user import (
     new_user_by_username,
 )
 from internal.usecase.interface import IUserReadUC
-from internal.usecase.ports.user import (
+from internal.usecase.adapters.user import (
     IReader,
     ICreator,
 )

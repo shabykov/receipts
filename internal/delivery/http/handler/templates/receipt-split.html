@@ -20,7 +20,7 @@
             <th>Product</th>
             <th>Qty</th>
             <th>Price</th>
-            <th>Splited</th>
+            <th>Splited by</th>
             <th>Choice</th>
             </thead>
             <tbody>
@@ -37,8 +37,10 @@
                     {% endfor %}
                 </td>
                 <td>
-                    {% if not item.is_splittable %}
+                    {% if item.is_splittable %}
                     <input type="checkbox" name="receipt_items" value="{{ item.uuid }}">
+                    {% else %}
+                        "xxx"
                     {% endif %}
                 </td>
             </tr>
@@ -46,6 +48,7 @@
             {% endfor %}
         </table>
         <button type="submit">Submit</button>
+        <button type="button"><a href={{ url_for('show', receipt_uuid=receipt.uuid ) }}>Back</a></button>
     </form>
 {% endif %}
 {% endblock %}

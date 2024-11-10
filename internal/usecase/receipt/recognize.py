@@ -3,7 +3,7 @@ from logging import getLogger
 from internal.domain.image import Image
 from internal.domain.receipt import Receipt
 from internal.usecase.interface import IReceiptRecognizeUC
-from internal.usecase.ports.receipt import ICreator, IRecognizer
+from internal.usecase.adapters.receipt import ICreator, IRecognizer
 
 logger = getLogger("receipt.recognizer")
 

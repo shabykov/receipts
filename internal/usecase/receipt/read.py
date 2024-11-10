@@ -4,7 +4,7 @@ from pydantic import UUID4
 
 from internal.domain.receipt import Receipt
 from internal.usecase.interface import IReceiptReadUC
-from internal.usecase.ports.receipt import IReader
+from internal.usecase.adapters.receipt import IReader
 
 
 class ReceiptReadUseCase(IReceiptReadUC):

@@ -10,7 +10,7 @@ from internal.domain.receipt.item import (
     ReceiptItemUpdateError,
     ReceiptItemReadError,
 )
-from internal.usecase.ports.receipt.item import (
+from internal.usecase.adapters.receipt.item import (
     ICreator,
     IUpdater,
     IReader,
@@ -64,7 +64,8 @@ UPSERT_RECEIPT_ITEM_SQL = """
     DO UPDATE SET
         product = EXCLUDED.product, 
         quantity = EXCLUDED.quantity,
-        price = EXCLUDED.price;
+        price = EXCLUDED.price,
+        split_by_users = EXCLUDED.split_by_users;
 """
 
 SELECT_RECEIPT_ITEM_SQL = """

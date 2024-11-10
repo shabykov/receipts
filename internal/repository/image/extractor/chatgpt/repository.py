@@ -7,7 +7,7 @@ from internal.domain.image import (
     Image,
     ImageExtractError,
 )
-from internal.usecase.ports.image import ImageExtractor
+from internal.usecase.adapters.image import ImageExtractor
 from .dto import SuccessDTO, ErrorDTO
 
 logger = getLogger("image.extractor.chatgpt")
