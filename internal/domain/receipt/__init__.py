@@ -1,12 +1,11 @@
-from ._error import (
+from .error import (
     ReceiptReadError,
     ReceiptRecognizeError,
     ReceiptCreateError,
     ReceiptUpdateError,
-    ReceiptSplitErr,
     ReceiptItemsAlreadySplited,
 )
-from ._model import Receipt, ReceiptItem, new
+from .model import Receipt, ReceiptItem, new
 
 __all__ = (
     'new',
@@ -16,6 +15,5 @@ __all__ = (
     'ReceiptReadError',
     'ReceiptCreateError',
     'ReceiptUpdateError',
-    'ReceiptSplitErr',
     'ReceiptItemsAlreadySplited',
 )

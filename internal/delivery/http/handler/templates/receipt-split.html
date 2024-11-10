@@ -30,13 +30,17 @@
                 <td>{{item.quantity}}</td>
                 <td>{{item.price}}</td>
                 <td>
-                    {% for username in item.split_by %}
+                    {% for username in item.split_by_users %}
                     <ul>
                         <li>{{ username }}</li>
                     </ul>
                     {% endfor %}
                 </td>
-                <td><input type="checkbox" name="receipt_items" value="{{ item.uuid }}"></td>
+                <td>
+                    {% if not item.is_splittable %}
+                    <input type="checkbox" name="receipt_items" value="{{ item.uuid }}">
+                    {% endif %}
+                </td>
             </tr>
             </tbody>
             {% endfor %}

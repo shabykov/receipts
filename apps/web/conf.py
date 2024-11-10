@@ -18,7 +18,7 @@ class Settings(BaseSettings, case_sensitive=False):
         env_file='.env',
         env_file_encoding='utf-8'
     )
-    domain: str
+    url: str
     bot_name: str
     secret_key: SecretStr
     telegram_bot_token: SecretStr

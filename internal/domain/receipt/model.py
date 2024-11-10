@@ -1,12 +1,10 @@
 import typing as t
 import uuid
-from collections import defaultdict
 from datetime import datetime
 
 from pydantic import BaseModel, Field, UUID4
 
 from internal.domain.receipt.item import ReceiptItem
-from internal.domain.receipt.split import Split, SplitCreateError
 from pkg.datetime import now
 
 
@@ -55,34 +53,11 @@ class Receipt(BaseModel):
         # required condition to valid receipt
         return len(self.items) > 0 and self.total > 0
 
-    def set_splits(self, splits: t.List[Split]):
-
-        # agg users by receipt_item_id
-        items = defaultdict(list)
-        for split in splits:
-            items[split.receipt_item_id].append(split.username)
-
-        # set users by receipt_item_id
-        for receipt_item in self.items:
-            receipt_item.split_by = items.get(receipt_item.uuid, [])
-
-    def split_by(self, username: str, splits: t.List[str]):
-
-        # agg users by receipt_item_id
-        items = defaultdict(list)
-        for split_item_id in splits:
-            items[split_item_id].append(username)
-
+    def split(self, username: str, items: t.List[UUID4]):
+        hs = set(items)
         for item in self.items:
-            # check is item splitable
-            if item.quantity < (len(item.split_by) + len(items[str(item.uuid)])):
-                raise SplitCreateError(
-                    "Item {} has already splited by {}".format(
-                        item.product,
-                        ", ".join(item.split_by)
-                    )
-                )
-            item.split_by.append(username)
+            if item.uuid in hs:
+                item.split(username)
 
 
 def new(

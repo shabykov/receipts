@@ -10,7 +10,6 @@ from internal.delivery.http.handler.show import ShowHandler
 from internal.delivery.http.handler.split import SplitHandler
 from internal.repository.receipt.storage.postgres.repository import Repository as ReceiptStorage
 from internal.repository.receipt_item.storage.postgres.repository import Repository as ReceiptItemStorage
-from internal.repository.receipt_split.storage.postgres.repository import Repository as ReceiptSplitStorage
 from internal.repository.user.storage.postgres.repository import Repository as UserStorage
 from internal.usecase.receipt.read import ReceiptReadUseCase
 from internal.usecase.receipt.split import ReceiptSplitUseCase
@@ -49,10 +48,6 @@ user_uc = UserReadUseCase(
     reader=user_storage,
     creator=user_storage
 )
-
-split_storage = ReceiptSplitStorage(
-    conn=postgresql_conn
-)
 receipt_reader_uc = ReceiptReadUseCase(
     reader=receipt_storage,
 )
@@ -61,7 +56,7 @@ user_session_uc = UserSessionUseCase(
 )
 delivery = Delivery(
     login_handler=LoginHandler(
-        domain=settings.domain,
+        url=settings.url,
         bot_name=settings.bot_name,
         auth=TelegramAuth(
             bot_token=settings.telegram_bot_token
@@ -70,11 +65,10 @@ delivery = Delivery(
     ),
     receipt_split_handler=SplitHandler(
         user_session_uc=user_session_uc,
+        receipt_read_us=receipt_reader_uc,
         receipt_split_uc=ReceiptSplitUseCase(
             user_uc=user_uc,
-            receipt_uc=receipt_reader_uc,
-            split_reader=split_storage,
-            split_creator=split_storage,
+            receipt_item_updater=receipt_item_storage,
         ),
     ),
     receipt_show_handler=ShowHandler(
@@ -98,6 +92,7 @@ class App:
 
 
 if __name__ == "__main__":
+
     web_app = App(http_listener=delivery)
 
     logger.info("start web web")

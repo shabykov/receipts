@@ -10,9 +10,11 @@ class Delivery:
     def __init__(
             self,
             bot: TeleBot,
+            url: str,
             receipt_recognizer_uc: IReceiptRecognizeUC
     ):
         self.bot = bot
+        self.url = url
         self.receipt_recognizer_uc = receipt_recognizer_uc
         self.init_handlers()
 
@@ -69,5 +71,5 @@ class Delivery:
 
         return self.bot.reply_to(
             message,
-            text=f"http://localhost:8080/receipts/{receipt.uuid}/show",
+            text=f"{self.url}/receipts/{receipt.uuid}/show",
         )

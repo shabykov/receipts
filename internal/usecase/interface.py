@@ -28,13 +28,9 @@ class IReceiptReadUC(ABC):
 
 
 class IReceiptSplitUC(ABC):
-    @abstractmethod
-    def get(self, receipt_uuid: UUID4) -> Receipt:
-        # public get interface
-        raise NotImplementedError("method `.get()` must be implemented")
 
     @abstractmethod
-    def create(self, user: User, receipt_uuid: UUID4, items: t.List[str]) -> Receipt:
+    def split(self, user: User, receipt: Receipt, items: t.List[str]) -> Receipt:
         # public split interface
         raise NotImplementedError("method `.create()` must be implemented")
 

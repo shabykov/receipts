@@ -8,3 +8,7 @@ class ReceiptItemUpdateError(Exception):
 
 class ReceiptItemReadError(Exception):
     pass
+
+
+class ReceiptItemSplitError(Exception):
+    pass

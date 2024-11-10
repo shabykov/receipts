@@ -20,12 +20,13 @@ logger = getLogger("receipt_item.storage.postgres")
 
 CREATE_SCHEMA_SQL = """
     CREATE TABLE IF NOT EXISTS tbl_receipt_item (
-        receipt_uuid text NOT NULL,
-        uuid         varchar(255) PRIMARY KEY,
-        product      text,
-        quantity     text,
-        price        numeric(6),
-        created_at   timestamp without time zone,
+        receipt_uuid   text NOT NULL,
+        uuid           varchar(255) PRIMARY KEY,
+        product        text,
+        quantity       text,
+        price          numeric(6),
+        split_by_users text[],
+        created_at     timestamp without time zone,
         UNIQUE(receipt_uuid, product)
     );
 """
@@ -41,9 +42,10 @@ INSERT_RECEIPT_ITEM_SQL = """
         product, 
         quantity, 
         price,
+        split_by_users,
         created_at
     )
-    VALUES (%s, %s, %s, %s, %s, %s) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s) 
     ON CONFLICT (receipt_uuid, product) 
     DO NOTHING;
 """
@@ -54,9 +56,10 @@ UPSERT_RECEIPT_ITEM_SQL = """
         uuid,
         product,
         quantity,
-        price
+        price,
+        split_by_users
     )
-    VALUES (%s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s, %s)
     ON CONFLICT(uuid)
     DO UPDATE SET
         product = EXCLUDED.product, 
@@ -70,6 +73,7 @@ SELECT_RECEIPT_ITEM_SQL = """
         product, 
         quantity, 
         price,
+        split_by_users,
         created_at
     FROM tbl_receipt_item 
     WHERE uuid = %(uuid)s;
@@ -81,6 +85,7 @@ SELECT_RECEIPT_ITEMS_SQL = """
         product, 
         quantity, 
         price,
+        split_by_users,
         created_at
     FROM tbl_receipt_item 
     WHERE receipt_uuid=%(receipt_uuid)s
@@ -118,6 +123,7 @@ class Repository(ICreator, IUpdater, IReader):
                         item.product,
                         item.quantity,
                         item.price,
+                        list(item.split_by_users),
                         item.created_at
                     )
                 )
@@ -141,6 +147,7 @@ class Repository(ICreator, IUpdater, IReader):
                             item.product,
                             item.quantity,
                             item.price,
+                            list(item.split_by_users),
                             item.created_at
                         ) for item in items
                     ]
@@ -165,7 +172,8 @@ class Repository(ICreator, IUpdater, IReader):
                         item.uuid,
                         item.product,
                         item.quantity,
-                        item.price
+                        item.price,
+                        list(item.split_by_users)
                     )
                 )
         except psycopg.errors.DatabaseError as e:
@@ -187,7 +195,8 @@ class Repository(ICreator, IUpdater, IReader):
                             item.uuid,
                             item.product,
                             item.quantity,
-                            item.price
+                            item.price,
+                            list(item.split_by_users),
                         ) for item in items
                     ]
                 )
@@ -220,7 +229,8 @@ class Repository(ICreator, IUpdater, IReader):
             product=row[1],
             quantity=row[2],
             price=row[3],
-            created_at=row[4]
+            split_by_users=set(row[4]),
+            created_at=row[5]
         )
 
     def read_many(self, receipt_uuid: UUID4, limit: int = 100, offset: int = 0) -> t.List[ReceiptItem]:
@@ -243,8 +253,8 @@ class Repository(ICreator, IUpdater, IReader):
                             product=row[1],
                             quantity=row[2],
                             price=row[3],
-                            created_at=row[4],
-                            split_by=[],
+                            split_by_users=set(row[4]),
+                            created_at=row[5],
                         )
                     )
         except psycopg.errors.DatabaseError as e:

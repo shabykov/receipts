@@ -22,6 +22,7 @@ class Settings(BaseSettings, case_sensitive=False):
     logging_level: str = Field(
         default="INFO"
     )
+    url: str
     telegram_bot_token: SecretStr
     openai_api_key: SecretStr
     openai_api_url: HttpUrl

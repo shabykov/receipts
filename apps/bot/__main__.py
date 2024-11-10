@@ -43,6 +43,7 @@ receipt_storage = ReceiptStorage(
 
 delivery = Delivery(
     bot=telegram_bot,
+    url=settings.url,
     receipt_recognizer_uc=ReceiptRecognizeUseCase(
         recognizer=receipt_recognizer,
         creator=receipt_storage,

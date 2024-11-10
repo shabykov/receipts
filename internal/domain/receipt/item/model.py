@@ -4,6 +4,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, UUID4
 
+from internal.domain.receipt.item import ReceiptItemSplitError
 from pkg.datetime import now
 
 
@@ -23,8 +24,21 @@ class ReceiptItem(BaseModel):
     created_at: datetime = Field(
         default_factory=now
     )
+    split_by_users: t.Set[str] = Field(
+        default_factory=set,
+    )
 
-    split_by: t.List[str]
+    def split(self, username: str):
+        if len(self.split_by_users) == self.quantity:
+            raise ReceiptItemSplitError("receipt item has already splited")
+
+        self.split_by_users.add(username)
+
+    def is_splittable(self) -> bool:
+        if len(self.split_by_users) == self.quantity:
+            return False
+
+        return True
 
 
 def new(product: str, quantity: int, price: float) -> ReceiptItem:
