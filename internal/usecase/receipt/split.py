@@ -22,9 +22,8 @@ class ReceiptSplitUseCase(IReceiptSplitUC):
         self._receipt_item_updater = receipt_item_updater
 
     def split(self, receipt: Receipt, choices: t.List[Choice]):
-        # slit receipt
-        receipt.split(choices)
-
-        # save receipt items
-        self._receipt_item_updater.update_many(receipt.uuid, receipt.items)
-        return receipt
+        # split receipt items
+        self._receipt_item_updater.update_many(
+            receipt.uuid,
+            receipt.split(choices)
+        )

@@ -50,7 +50,7 @@ class SplitHandler:
             try:
                 self.receipt_split_uc.split(
                     receipt,
-                    [
+                    choices=[
                         Choice(
                            username=user.username,
                            uuid=uuid

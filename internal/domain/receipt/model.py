@@ -75,11 +75,14 @@ class Receipt(BaseModel):
 
         return [v for v in results.values()]
 
-    def split(self, choices: t.List[Choice]):
+    def split(self, choices: t.List[Choice]) -> t.List[ReceiptItem]:
         hs = {choice.uuid: choice for choice in choices}
+        splitted = []
         for item in self.items:
             if item.uuid in hs:
                 item.split(hs[item.uuid])
+                splitted.append(item)
+        return splitted
 
 
 def new(

@@ -31,7 +31,7 @@ class IReceiptReadUC(ABC):
 class IReceiptSplitUC(ABC):
 
     @abstractmethod
-    def split(self, receipt: Receipt, choices: t.List[Choice]) -> Receipt:
+    def split(self, receipt: Receipt, choices: t.List[Choice]):
         # public split interface
         raise NotImplementedError("method `.create()` must be implemented")
 
