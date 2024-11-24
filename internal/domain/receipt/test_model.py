@@ -3,8 +3,7 @@ import uuid
 import pytest
 
 from internal.domain.receipt import Receipt
-from internal.domain.receipt import ReceiptItem
-from internal.domain.receipt.item import ReceiptItemSplitError
+from internal.domain.receipt.item import ReceiptItem, Choice, ReceiptItemSplitError
 
 
 @pytest.fixture()
@@ -13,48 +12,67 @@ def receipt_uuid():
 
 
 @pytest.fixture()
-def receipt_item_1():
-    return uuid.uuid4()
+def receipt_item_choice_1():
+    return Choice(
+        uuid=uuid.uuid4(),
+        quantity=1,
+        username="user1"
+    )
 
 
 @pytest.fixture()
-def receipt_item_2():
-    return uuid.uuid4()
+def receipt_item_choice_2():
+    return Choice(
+        uuid=uuid.uuid4(),
+        quantity=1,
+        username="user1"
+    )
 
 
 @pytest.fixture()
-def receipt_item_3():
-    return uuid.uuid4()
+def receipt_item_choice_3():
+    return Choice(
+        uuid=uuid.uuid4(),
+        quantity=1,
+        username="user1"
+    )
 
 
 @pytest.fixture()
-def receipt_item_4():
-    return uuid.uuid4()
+def receipt_item_choice_4():
+    return Choice(
+        uuid=uuid.uuid4(),
+        quantity=1,
+        username="user1"
+    )
 
 
 @pytest.fixture()
-def receipt_items(receipt_item_1, receipt_item_2, receipt_item_3, receipt_item_4):
+def receipt_items(receipt_item_choice_1, receipt_item_choice_2, receipt_item_choice_3, receipt_item_choice_4):
     return [
         ReceiptItem(
-            uuid=receipt_item_1,
+            uuid=receipt_item_choice_1.uuid,
             product="Product 1",
             quantity=1,
-
+            price=1000,
         ),
         ReceiptItem(
-            uuid=receipt_item_2,
+            uuid=receipt_item_choice_2.uuid,
             product="Product 2",
             quantity=2,
+            price=1000,
         ),
         ReceiptItem(
-            uuid=receipt_item_3,
+            uuid=receipt_item_choice_3.uuid,
             product="Product 3",
             quantity=3,
+            price=1000,
         ),
         ReceiptItem(
-            uuid=receipt_item_4,
+            uuid=receipt_item_choice_4.uuid,
             product="Product 4",
             quantity=1,
+            price=1000,
         ),
     ]
 
@@ -68,18 +86,75 @@ def receipt(receipt_uuid, receipt_items):
     )
 
 
-def test_split(receipt, receipt_item_1, receipt_item_2, receipt_item_3, receipt_item_4):
-    receipt.split("user1", [receipt_item_1, receipt_item_2, receipt_item_3, receipt_item_4])
-    assert "user1" in receipt.items[0].split_by_users
-    assert "user1" in receipt.items[1].split_by_users
-    assert "user1" in receipt.items[2].split_by_users
-    assert "user1" in receipt.items[3].split_by_users
+def test_split(receipt, receipt_item_choice_1, receipt_item_choice_2, receipt_item_choice_3, receipt_item_choice_4):
+    receipt.split(
+        [
+            receipt_item_choice_1,
+            receipt_item_choice_2,
+            receipt_item_choice_3,
+            receipt_item_choice_4,
+        ]
+    )
+    assert "user1" in receipt.items[0].splits
+    assert "user1" in receipt.items[1].splits
+    assert "user1" in receipt.items[2].splits
+    assert "user1" in receipt.items[3].splits
 
-    receipt.split("user2", [receipt_item_2, receipt_item_3])
-    assert "user2" in receipt.items[1].split_by_users
-    assert "user2" in receipt.items[2].split_by_users
+    receipt.split(
+        [
+            Choice(
+                username="user2",
+                uuid=receipt_item_choice_2.uuid,
+                quantity=receipt_item_choice_2.quantity
+            ),
+            Choice(
+                username="user2",
+                uuid=receipt_item_choice_3.uuid,
+                quantity=receipt_item_choice_3.quantity
+            )
+        ]
+    )
+    assert "user2" in receipt.items[1].splits
+    assert "user2" in receipt.items[2].splits
 
     with pytest.raises(ReceiptItemSplitError) as err:
-        receipt.split("user3", [receipt_item_4])
+        receipt.split([
+            Choice(
+                username="user3",
+                uuid=receipt_item_choice_4.uuid,
+                quantity=receipt_item_choice_4.quantity
+            )
+        ])
 
-    assert "receipt item has already splited" in str(err.value)
+    assert "receipt item has already split" in str(err.value)
+
+
+def test_result(receipt, receipt_item_choice_1, receipt_item_choice_2, receipt_item_choice_3, receipt_item_choice_4):
+    receipt.split(
+        [
+            receipt_item_choice_1,
+            receipt_item_choice_2,
+            receipt_item_choice_3,
+            receipt_item_choice_4,
+        ]
+    )
+    receipt.split(
+        [
+            Choice(
+                username="user2",
+                uuid=receipt_item_choice_2.uuid,
+                quantity=receipt_item_choice_2.quantity
+            ),
+            Choice(
+                username="user2",
+                uuid=receipt_item_choice_3.uuid,
+                quantity=receipt_item_choice_3.quantity
+            ),
+        ]
+    )
+    splits = receipt.results()
+    assert len(splits) == 2
+    assert splits[0].username == "user1"
+    assert splits[0].amount == 1000 + 500 + 1000 / 3 + 1000
+    assert splits[1].username == "user2"
+    assert splits[1].amount == 500 + 1000 / 3

@@ -1,11 +1,17 @@
 import typing as t
 import uuid
+from collections import defaultdict
 from datetime import datetime
 
 from pydantic import BaseModel, Field, UUID4
 
-from internal.domain.receipt.item import ReceiptItem
+from internal.domain.receipt.item import ReceiptItem, Split, Choice
 from pkg.datetime import now
+
+
+class Result(BaseModel):
+    username: str
+    amount: float
 
 
 class Receipt(BaseModel):
@@ -42,9 +48,6 @@ class Receipt(BaseModel):
     created_at: datetime = Field(
         default_factory=now
     )
-    is_splitd: bool = Field(
-        default=False
-    )
 
     def set_user_id(self, user_id: int):
         self.user_id = user_id
@@ -53,11 +56,30 @@ class Receipt(BaseModel):
         # required condition to valid receipt
         return len(self.items) > 0 and self.total > 0
 
-    def split(self, username: str, items: t.List[UUID4]):
-        hs = set(items)
+    def is_splitted(self) -> bool:
+        return all([item.is_splittable() for item in self.items])
+
+    def results(self) -> t.List[Result]:
+
+        results = defaultdict(Result)
+
+        for item in self.items:
+            for split in item.splits:
+                if split.username not in results:
+                    results[split.username] = Result(
+                        username=split.username,
+                        amount=item.price_per_user(split.username)
+                    )
+                else:
+                    results[split.username].amount += item.price_per_user(split.username)
+
+        return [v for v in results.values()]
+
+    def split(self, choices: t.List[Choice]):
+        hs = {choice.uuid: choice for choice in choices}
         for item in self.items:
             if item.uuid in hs:
-                item.split(username)
+                item.split(hs[item.uuid])
 
 
 def new(

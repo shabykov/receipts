@@ -5,7 +5,7 @@ import psycopg
 from internal.domain.user import User, UserCreateError, UserReadError
 from internal.usecase.adapters.user import IReader, ICreator
 
-CREATE_SCHEMA_SQL = """
+CREATE_SCHEMA_SQL = b"""
     CREATE TABLE IF NOT EXISTS tbl_user (
         user_id  integer PRIMARY KEY,
         username varchar(300) UNIQUE,
@@ -13,7 +13,7 @@ CREATE_SCHEMA_SQL = """
     );
 """
 
-INSERT_SQL = """
+INSERT_SQL = b"""
     INSERT INTO tbl_user (
         user_id, 
         username,
@@ -26,7 +26,7 @@ INSERT_SQL = """
     ) ON CONFLICT (user_id) DO NOTHING;
 """
 
-SELECT_BY_USER_ID_SQL = """
+SELECT_BY_USER_ID_SQL = b"""
     SELECT
         user_id, 
         username,
@@ -35,7 +35,7 @@ SELECT_BY_USER_ID_SQL = """
     WHERE user_id = %(user_id)s;
 """
 
-SELECT_BY_USERNAME_SQL = """
+SELECT_BY_USERNAME_SQL = b"""
     SELECT
         user_id, 
         username,

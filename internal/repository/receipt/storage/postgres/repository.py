@@ -26,7 +26,7 @@ from internal.usecase.adapters.receipt import (
 
 logger = getLogger("receipt.storge.postgres")
 
-CREATE_SCHEMA_SQL = """
+CREATE_SCHEMA_SQL = b"""
     CREATE TABLE IF NOT EXISTS tbl_receipt (
         user_id    integer NOT NULL,
         uuid       varchar(255) PRIMARY KEY,
@@ -41,11 +41,11 @@ CREATE_SCHEMA_SQL = """
     );
 """
 
-CLEAN_SCHEMA_SQL = """
+CLEAN_SCHEMA_SQL = b"""
     truncate table tbl_receipt;
 """
 
-INSERT_RECEIPT_SQL = """
+INSERT_RECEIPT_SQL = b"""
     INSERT INTO tbl_receipt (
         user_id, 
         uuid,
@@ -72,7 +72,7 @@ INSERT_RECEIPT_SQL = """
     ) ON CONFLICT (uuid) DO NOTHING;
 """
 
-UPSERT_RECEIPT_SQL = """
+UPSERT_RECEIPT_SQL = b"""
     INSERT INTO tbl_receipt (
         user_id, 
         uuid,
@@ -106,7 +106,7 @@ UPSERT_RECEIPT_SQL = """
         total = EXCLUDED.total;
 """
 
-SELECT_RECEIPT_SQL = """
+SELECT_RECEIPT_SQL = b"""
     SELECT
         user_id, 
         uuid,

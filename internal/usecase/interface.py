@@ -7,6 +7,7 @@ from pydantic import UUID4
 
 from internal.domain.image import Image
 from internal.domain.receipt import Receipt
+from internal.domain.receipt.item import Choice
 from internal.domain.user import User
 
 
@@ -30,7 +31,7 @@ class IReceiptReadUC(ABC):
 class IReceiptSplitUC(ABC):
 
     @abstractmethod
-    def split(self, user: User, receipt: Receipt, items: t.List[str]) -> Receipt:
+    def split(self, receipt: Receipt, choices: t.List[Choice]) -> Receipt:
         # public split interface
         raise NotImplementedError("method `.create()` must be implemented")
 

@@ -30,7 +30,7 @@
                 <td>{{item.quantity}}</td>
                 <td>{{item.price}}</td>
                 <td>
-                    {% for username in item.split_by_users %}
+                    {% for username in item.splits %}
                     <ul>
                         <li>{{ username }}</li>
                     </ul>
@@ -40,12 +40,12 @@
                     {% if item.is_splittable %}
                     <input type="checkbox" name="receipt_items" value="{{ item.uuid }}">
                     {% else %}
-                        "xxx"
+                    <input type="checkbox" disabled="true">
                     {% endif %}
                 </td>
             </tr>
-            </tbody>
             {% endfor %}
+            </tbody>
         </table>
         <button type="submit">Submit</button>
         <button type="button"><a href={{ url_for('show', receipt_uuid=receipt.uuid ) }}>Back</a></button>

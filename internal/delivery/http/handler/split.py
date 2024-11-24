@@ -4,7 +4,7 @@ from flask import Request, render_template, redirect, url_for
 from pydantic import BaseModel, ValidationError, UUID4
 
 from internal.domain.receipt import ReceiptReadError
-from internal.domain.receipt.item import ReceiptItemSplitError
+from internal.domain.receipt.item import ReceiptItemSplitError, Choice
 from internal.usecase.interface import IReceiptReadUC, IReceiptSplitUC, IUserSessionUC
 
 
@@ -44,19 +44,24 @@ class SplitHandler:
             if err != "":
                 return render_template(
                     "receipt-split.html",
-                    **{"receipt": None, "err": err}
+                    **{"receipt": receipt, "err": err}
                 )
 
             try:
                 self.receipt_split_uc.split(
-                    user,
                     receipt,
-                    param.receipt_items,
+                    [
+                        Choice(
+                           username=user.username,
+                           uuid=uuid
+                        )
+                        for uuid in param.receipt_items
+                    ],
                 )
             except ReceiptItemSplitError as err:
                 return render_template(
                     "receipt-split.html",
-                    **{"receipt": None, "error": err}
+                    **{"receipt": receipt, "error": err}
                 )
 
         return render_template(
