@@ -5,7 +5,7 @@ import psycopg
 import pytest
 from pydantic import UUID4
 
-from internal.domain.receipt.item import ReceiptItem, Split
+from internal.domain.receipt.item import ReceiptItem, Split, Choice
 from internal.repository.receipt_item.storage.postgres.repository import Repository
 
 
@@ -46,14 +46,14 @@ def item() -> ReceiptItem:
 
 
 @pytest.fixture(scope="function")
-def items() -> t.List[ReceiptItem]:
+def receipt_items() -> t.List[ReceiptItem]:
     return [
         ReceiptItem(
             product="pepsi cola",
             quantity=3,
             price=5678,
             splits={
-                Split(username="user1"),
+                Split(username="user1", quantity=2),
                 Split(username="user2")
             }
         ),
@@ -63,7 +63,7 @@ def items() -> t.List[ReceiptItem]:
             price=100,
             splits={
                 Split(username="user1"),
-                Split(username="user2")
+                Split(username="user2", quantity=2)
             }
         ),
         ReceiptItem(
@@ -78,27 +78,31 @@ def items() -> t.List[ReceiptItem]:
     ]
 
 
-def test_create_many(repo, receipt_uuid, items):
+def test_create_many(repo, receipt_uuid, receipt_items):
 
-    repo.create_many(receipt_uuid, items)
+    repo.create_many(receipt_uuid, receipt_items)
 
-    created_items = repo.read_many(receipt_uuid)
+    created_items = repo.read_by_receipt_uuid(receipt_uuid)
 
-    assert len(items) == len(created_items)
+    assert len(receipt_items) == len(created_items)
 
 
-def test_update_many(repo, receipt_uuid, items):
-    repo.create_many(receipt_uuid, items)
+def test_update_many(repo, receipt_uuid, receipt_items):
 
-    items[1].product = "new name"
-    items[1].quantity = 777
-    items[1].split(
-        Split(username="user1", uuid=items[1].uuid)
+    repo.create_many(receipt_uuid, receipt_items)
+
+    receipt_items[1].product = "new name"
+    receipt_items[1].quantity = 777
+    receipt_items[1].split(
+        Choice(
+            username="user1",
+            uuid=receipt_items[1].uuid,
+        )
     )
 
-    repo.update_many(receipt_uuid, items)
+    repo.update_many(receipt_uuid, receipt_items)
 
-    updated_item = repo.read_by_uuid(items[1].uuid)
+    updated_item = repo.read_by_uuid(receipt_items[1].uuid)
 
-    assert items[1].product == updated_item.product
-    assert items[1].quantity == updated_item.quantity
+    assert receipt_items[1].product == updated_item.product
+    assert receipt_items[1].quantity == updated_item.quantity

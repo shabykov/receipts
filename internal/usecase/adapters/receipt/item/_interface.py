@@ -20,5 +20,5 @@ class IUpdater(ABC):
 
 class IReader(ABC):
     @abstractmethod
-    def read_many(self, receipt_uuid: UUID4, limit: int, offset: int) -> t.List[ReceiptItem]:
+    def read_by_receipt_uuid(self, receipt_uuid: UUID4) -> t.List[ReceiptItem]:
         raise NotImplementedError("method `.read_many()` must be implemented")

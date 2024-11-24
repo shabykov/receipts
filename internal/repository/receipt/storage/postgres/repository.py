@@ -213,7 +213,7 @@ class Repository(ICreator, IUpdater, IReader):
 
     def read_by_uuid(self, uuid: UUID4) -> t.Optional[Receipt]:
         try:
-            items = self._item_repo.read_many(uuid, 100, 0)
+            items = self._item_repo.read_by_receipt_uuid(uuid)
         except ReceiptItemReadError as err:
             raise ReceiptReadError("read receipt items err: %s" % err)
 

@@ -5,7 +5,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, UUID4
 
-from internal.domain.receipt.item import ReceiptItem, Split, Choice
+from internal.domain.receipt.item import ReceiptItem, Choice
 from pkg.datetime import now
 
 

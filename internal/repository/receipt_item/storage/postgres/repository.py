@@ -15,9 +15,6 @@ from internal.usecase.adapters.receipt.item import (
     IUpdater,
     IReader,
 )
-from internal.usecase.adapters.receipt.item.split import (
-    IUpdater as ISplitUpdater
-)
 
 logger = getLogger("receipt_item.storage.postgres")
 
@@ -59,7 +56,7 @@ UPSERT_RECEIPT_ITEM_SQL = b"""
         quantity,
         price
     )
-    VALUES (%s, %s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s)
     ON CONFLICT(uuid)
     DO UPDATE SET
         product = EXCLUDED.product, 
@@ -69,32 +66,37 @@ UPSERT_RECEIPT_ITEM_SQL = b"""
 
 SELECT_RECEIPT_ITEM_SQL = b"""
     SELECT
-        uuid, 
-        product, 
-        quantity, 
-        price,
-        created_at
-    FROM tbl_receipt_item 
-    WHERE uuid = %(uuid)s;
+        i.uuid, 
+        i.product, 
+        i.quantity, 
+        i.price, 
+        i.created_at, 
+        json_agg(json_build_object('username', s.username, 'quantity', s.quantity))
+    FROM tbl_receipt_item as i
+    LEFT JOIN tbl_receipt_item_split as s
+    ON (i.uuid = s.uuid)
+    WHERE i.uuid = %(uuid)s
+    GROUP BY i.uuid;
 """
 
 SELECT_RECEIPT_ITEMS_SQL = b"""
     SELECT
-        uuid, 
-        product, 
-        quantity, 
-        price,
-        created_at
-    FROM tbl_receipt_item 
-    WHERE receipt_uuid=%(receipt_uuid)s
-    ORDER BY created_at
-    LIMIT %(limit)s
-    OFFSET %(offset)s;
+        i.uuid, 
+        i.product, 
+        i.quantity, 
+        i.price, 
+        i.created_at, 
+        json_agg(json_build_object('username', s.username, 'quantity', s.quantity))
+    FROM tbl_receipt_item as i
+    LEFT JOIN tbl_receipt_item_split as s
+    ON (i.uuid = s.uuid)
+    WHERE i.receipt_uuid=%(receipt_uuid)s
+    GROUP BY i.uuid;
 """
 
 CREATE_RECEIPT_ITEM_SPLIT_SQL = b"""
     CREATE TABLE IF NOT EXISTS tbl_receipt_item_split (
-        uuid           varchar(255) PRIMARY KEY,
+        uuid           varchar(255),
         username       text,
         quantity       integer,
         UNIQUE(uuid, username)
@@ -117,20 +119,8 @@ UPSERT_RECEIPT_ITEM_SPLIT_SQL = b"""
         quantity = EXCLUDED.quantity;
 """
 
-SELECT_RECEIPT_ITEM_SPLIT_SQL = b"""
-    SELECT
-        uuid, 
-        username,
-        quantity
-    FROM tbl_receipt_item_split 
-    WHERE receipt_uuid=%(receipt_uuid)s
-    ORDER BY created_at
-    LIMIT %(limit)s
-    OFFSET %(offset)s;
-"""
 
-
-class Repository(ICreator, IUpdater, IReader, ISplitUpdater):
+class Repository(ICreator, IUpdater, IReader):
     def __init__(self, conn: psycopg.Connection):
         self._conn = conn
         self.init_schema()
@@ -149,9 +139,19 @@ class Repository(ICreator, IUpdater, IReader, ISplitUpdater):
         self._conn.commit()
         logger.info("receipt item schema cleaned")
 
-    def create_many(self, receipt_uuid: UUID4, items: t.List[ReceiptItem]):
+    def create_many(self, receipt_uuid: UUID4, receipt_items: t.List[ReceiptItem]):
         try:
             with self._conn.cursor() as cur:
+                cur.executemany(
+                    query=UPSERT_RECEIPT_ITEM_SPLIT_SQL,
+                    params_seq=[
+                        (
+                            receipt_item.uuid,
+                            split.username,
+                            split.quantity
+                        ) for receipt_item in receipt_items for split in receipt_item.splits
+                    ]
+                )
                 cur.executemany(
                     query=INSERT_RECEIPT_ITEM_SQL,
                     params_seq=[
@@ -162,22 +162,32 @@ class Repository(ICreator, IUpdater, IReader, ISplitUpdater):
                             item.quantity,
                             item.price,
                             item.created_at
-                        ) for item in items
+                        ) for item in receipt_items
                     ]
                 )
         except psycopg.errors.DatabaseError as e:
             self._conn.rollback()
-            raise ReceiptItemCreateError("insert items err: %s" % e)
+            raise ReceiptItemCreateError("insert receipt_items err: %s" % e)
         else:
             self._conn.commit()
             logger.info(
-                "receipt items created: receipt_uuid=%s, items_count=%d" % (receipt_uuid, len(items))
+                "receipt receipt_items created: receipt_uuid=%s, items_count=%d" % (receipt_uuid, len(receipt_items))
             )
         return None
 
-    def update_many(self, receipt_uuid: UUID4, items: t.List[ReceiptItem]):
+    def update_many(self, receipt_uuid: UUID4, receipt_items: t.List[ReceiptItem]):
         try:
             with self._conn.cursor() as cur:
+                cur.executemany(
+                    query=UPSERT_RECEIPT_ITEM_SPLIT_SQL,
+                    params_seq=[
+                        (
+                            receipt_item.uuid,
+                            split.username,
+                            split.quantity
+                        ) for receipt_item in receipt_items for split in receipt_item.splits
+                    ]
+                )
                 cur.executemany(
                     query=UPSERT_RECEIPT_ITEM_SQL,
                     params_seq=[
@@ -187,16 +197,16 @@ class Repository(ICreator, IUpdater, IReader, ISplitUpdater):
                             item.product,
                             item.quantity,
                             item.price,
-                        ) for item in items
+                        ) for item in receipt_items
                     ]
                 )
         except psycopg.errors.DatabaseError as e:
             self._conn.rollback()
-            raise ReceiptItemUpdateError("upsert items err: %s" % e)
+            raise ReceiptItemUpdateError("upsert receipt_items err: %s" % e)
         else:
             self._conn.commit()
             logger.info(
-                "receipt items updated: receipt_uuid=%s, items_count=%d" % (receipt_uuid, len(items))
+                "receipt receipt_items updated: receipt_uuid=%s, items_count=%d" % (receipt_uuid, len(receipt_items))
             )
         return None
 
@@ -219,57 +229,36 @@ class Repository(ICreator, IUpdater, IReader, ISplitUpdater):
             product=row[1],
             quantity=row[2],
             price=row[3],
-            created_at=row[4]
+            created_at=row[4],
+            splits={
+                Split(**ob) for ob in row[5]
+            }
         )
 
-    def read_many(self, receipt_uuid: UUID4, limit: int = 100, offset: int = 0) -> t.List[ReceiptItem]:
-        items = []
+    def read_by_receipt_uuid(self, receipt_uuid: UUID4) -> t.List[ReceiptItem]:
+        receipt_items = []
         try:
             with self._conn.cursor() as cur:
                 cur.execute(
                     SELECT_RECEIPT_ITEMS_SQL,
                     params={
                         "receipt_uuid": str(receipt_uuid),
-                        "limit": limit,
-                        "offset": offset
                     }
                 )
-
                 for row in cur:
-                    items.append(
+                    receipt_items.append(
                         ReceiptItem(
                             uuid=row[0],
                             product=row[1],
                             quantity=row[2],
                             price=row[3],
                             created_at=row[4],
+                            splits={
+                                Split(**ob) for ob in row[5]
+                            }
                         )
                     )
         except psycopg.errors.DatabaseError as e:
-            raise ReceiptItemReadError("select items err: %s" % e)
+            raise ReceiptItemReadError("select receipt_items err: %s" % e)
 
-        return items
-
-    def upsert_splits(self, items: t.List[Split]):
-        try:
-            with self._conn.cursor() as cur:
-                cur.executemany(
-                    query=UPSERT_RECEIPT_ITEM_SPLIT_SQL,
-                    params_seq=[
-                        (
-                            item.uuid,
-                            item.username,
-                            item.quantity
-                        ) for item in items
-                    ]
-                )
-        except psycopg.errors.DatabaseError as e:
-            self._conn.rollback()
-            raise ReceiptItemUpdateError("upsert items splits err: %s" % e)
-        else:
-            self._conn.commit()
-            logger.info(
-                "receipt items split updated: items_count=%d" % len(items)
-            )
-
-        return None
+        return receipt_items
