@@ -21,7 +21,6 @@
             <th>Qty</th>
             <th>Price</th>
             <th>Splited by</th>
-            <th>Choice</th>
             </thead>
             <tbody>
             {% for item in receipt.items %}
@@ -30,18 +29,21 @@
                 <td>{{item.quantity}}</td>
                 <td>{{item.price}}</td>
                 <td>
-                    {% for username in item.splits %}
                     <ul>
-                        <li>{{ username }}</li>
+                        {% for split in item.splits %}
+                         <li>
+                        {% if split.username == user.username %}
+                            {{ split.username }}: <input
+                                 type="number"
+                                 id="{{ item.uuid }}"
+                                 name="quantity"
+                                 min="1"
+                                 max="{{ item.quantity }}"
+                                 value="{{ split.quantity }}">
+                        {% endif %}
+                        </li>
+                        {% endfor %}
                     </ul>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% if item.is_splittable %}
-                    <input type="checkbox" name="receipt_items" value="{{ item.uuid }}">
-                    {% else %}
-                    <input type="checkbox" disabled="true">
-                    {% endif %}
                 </td>
             </tr>
             {% endfor %}

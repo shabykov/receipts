@@ -230,9 +230,7 @@ class Repository(ICreator, IUpdater, IReader):
             quantity=row[2],
             price=row[3],
             created_at=row[4],
-            splits={
-                Split(**ob) for ob in row[5]
-            }
+            splits=parse_splits(row[5])
         )
 
     def read_by_receipt_uuid(self, receipt_uuid: UUID4) -> t.List[ReceiptItem]:
@@ -253,12 +251,21 @@ class Repository(ICreator, IUpdater, IReader):
                             quantity=row[2],
                             price=row[3],
                             created_at=row[4],
-                            splits={
-                                Split(**ob) for ob in row[5]
-                            }
+                            splits=parse_splits(row[5])
                         )
                     )
         except psycopg.errors.DatabaseError as e:
             raise ReceiptItemReadError("select receipt_items err: %s" % e)
 
         return receipt_items
+
+
+def parse_splits(data) -> t.Set[Split]:
+    ret = set()
+    for ob in data:
+        if ob and ob.get("username") and ob.get('quantity'):
+            ret.add(
+                Split(username=ob['username'], quantity=ob['quantity'])
+            )
+
+    return ret

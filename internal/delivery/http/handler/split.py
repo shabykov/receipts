@@ -66,11 +66,12 @@ class SplitHandler:
 
         return render_template(
             "receipt-split.html",
-            **{"receipt": receipt, "error": None}
+            **{"receipt": receipt, "user": user, "error": None}
         )
 
 
 class Body(BaseModel):
+
     receipt_items: t.List[UUID4]
 
 

@@ -1,7 +1,7 @@
 import hashlib
 import hmac
-
-from pydantic import BaseModel, SecretStr
+import typing as t
+from pydantic import BaseModel, SecretStr, Field
 
 KEY_STRING = (
     "auth_date={auth_date}\n"
@@ -15,10 +15,16 @@ KEY_STRING = (
 
 class AuthData(BaseModel):
     id: int
-    first_name: str
-    last_name: str
     username: str
-    photo_url: str
+    first_name: t.Optional[str] = Field(
+        default=""
+    )
+    last_name: t.Optional[str] = Field(
+        default=""
+    )
+    photo_url: t.Optional[str] = Field(
+        default=""
+    )
     auth_date: str
     hash: str
 
