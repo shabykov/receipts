@@ -20,12 +20,13 @@ logger = getLogger("receipt_item.storage.postgres")
 
 CREATE_RECEIPT_ITEM_SQL = b"""
     CREATE TABLE IF NOT EXISTS tbl_receipt_item (
-        receipt_uuid   text NOT NULL,
-        uuid           varchar(255) PRIMARY KEY,
-        product        text,
-        quantity       integer,
-        price          numeric(6),
-        created_at     timestamp without time zone,
+        receipt_uuid        text NOT NULL,
+        uuid                varchar(255) PRIMARY KEY,
+        product             text,
+        quantity            integer,
+        price               numeric(6),
+        split_error_message text,
+        created_at          timestamp without time zone,
         UNIQUE(receipt_uuid, product)
     );
 """
@@ -41,9 +42,10 @@ INSERT_RECEIPT_ITEM_SQL = b"""
         product, 
         quantity, 
         price,
-        created_at
+        created_at,
+        split_error_message
     )
-    VALUES (%s, %s, %s, %s, %s, %s) 
+    VALUES (%s, %s, %s, %s, %s, %s, %s) 
     ON CONFLICT (receipt_uuid, product) 
     DO NOTHING;
 """
@@ -54,13 +56,15 @@ UPSERT_RECEIPT_ITEM_SQL = b"""
         uuid,
         product,
         quantity,
-        price
+        price,
+        split_error_message
     )
-    VALUES (%s, %s, %s, %s, %s)
+    VALUES (%s, %s, %s, %s, %s, %s)
     ON CONFLICT(uuid)
     DO UPDATE SET
         product = EXCLUDED.product, 
         quantity = EXCLUDED.quantity,
+        split_error_message = EXCLUDED.split_error_message,
         price = EXCLUDED.price;
 """
 
@@ -71,6 +75,7 @@ SELECT_RECEIPT_ITEM_SQL = b"""
         i.quantity, 
         i.price, 
         i.created_at, 
+        i.split_error_message,
         json_agg(json_build_object('username', s.username, 'quantity', s.quantity))
     FROM tbl_receipt_item as i
     LEFT JOIN tbl_receipt_item_split as s
@@ -85,7 +90,8 @@ SELECT_RECEIPT_ITEMS_SQL = b"""
         i.product, 
         i.quantity, 
         i.price, 
-        i.created_at, 
+        i.created_at,
+        i.split_error_message,
         json_agg(json_build_object('username', s.username, 'quantity', s.quantity))
     FROM tbl_receipt_item as i
     LEFT JOIN tbl_receipt_item_split as s
@@ -161,7 +167,8 @@ class Repository(ICreator, IUpdater, IReader):
                             item.product,
                             item.quantity,
                             item.price,
-                            item.created_at
+                            item.created_at,
+                            item.split_error_message
                         ) for item in receipt_items
                     ]
                 )
@@ -197,6 +204,7 @@ class Repository(ICreator, IUpdater, IReader):
                             item.product,
                             item.quantity,
                             item.price,
+                            item.split_error_message
                         ) for item in receipt_items
                     ]
                 )
@@ -230,7 +238,8 @@ class Repository(ICreator, IUpdater, IReader):
             quantity=row[2],
             price=row[3],
             created_at=row[4],
-            splits=parse_splits(row[5])
+            split_error_message=row[5] if row[5] else "",
+            splits=parse_splits(row[6])
         )
 
     def read_by_receipt_uuid(self, receipt_uuid: UUID4) -> t.List[ReceiptItem]:
@@ -251,7 +260,8 @@ class Repository(ICreator, IUpdater, IReader):
                             quantity=row[2],
                             price=row[3],
                             created_at=row[4],
-                            splits=parse_splits(row[5])
+                            split_error_message=row[5] if row[5] else "",
+                            splits=parse_splits(row[6])
                         )
                     )
         except psycopg.errors.DatabaseError as e:

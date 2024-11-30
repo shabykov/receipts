@@ -5,52 +5,80 @@
 <body>
 
 {% if error != None %}
-    {{error}}
+{{error}}
 {% endif %}
 
 </body>
 
 {% if receipt != None %}
-    <form method="post">
-        <table>
-            <thead>
-            <tr>
-                <h2>Items</h2>
-            </tr>
-            <th>Product</th>
-            <th>Qty</th>
-            <th>Price</th>
-            <th>Splited by</th>
-            </thead>
-            <tbody>
-            {% for item in receipt.items %}
-            <tr>
-                <td>{{item.product}}</td>
-                <td>{{item.quantity}}</td>
-                <td>{{item.price}}</td>
-                <td>
-                    <ul>
+<form method="post">
+    <table>
+        <thead>
+        <tr>
+            <h2>Items</h2>
+        </tr>
+        <th>Product</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th>Splited by</th>
+        </thead>
+        <tbody>
+        {% for item in receipt.items %}
+        <tr>
+            <td>{{item.product}}</td>
+            <td>{{item.quantity}}</td>
+            <td>{{item.price}}</td>
+            <td>
+                {% if item.split_error_message != "" %}
+                    {{item.split_error_message}}
+                {% endif %}
+                <ul>
+                    {% if user.username in item.splits %}
                         {% for split in item.splits %}
-                         <li>
-                        {% if split.username == user.username %}
-                            {{ split.username }}: <input
-                                 type="number"
-                                 id="{{ item.uuid }}"
-                                 name="quantity"
-                                 min="1"
-                                 max="{{ item.quantity }}"
-                                 value="{{ split.quantity }}">
-                        {% endif %}
-                        </li>
+                            {% if split.username != user.username %}
+                                <li>
+                                    {{ user.username }} : <input type="number"
+                                                                  name="{{ item.uuid }}"
+                                                                  min="0"
+                                                                  max="{{ item.quantity }}"
+                                                                  value="{{ split.quantity }}" disabled>
+                                </li>
+                            {% else %}
+                                <li>
+                                    {{ split.username }} : <input type="number"
+                                                                  name="{{ item.uuid }}"
+                                                                  min="0"
+                                                                  max="{{ item.quantity }}"
+                                                                  value="{{ split.quantity }}">
+                                </li>
+                            {% endif %}
                         {% endfor %}
-                    </ul>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <button type="submit">Submit</button>
-        <button type="button"><a href={{ url_for('show', receipt_uuid=receipt.uuid ) }}>Back</a></button>
-    </form>
+                    {% else%}
+                        <li>
+                            {{ user.username }} : <input type="number"
+                                                          name="{{ item.uuid }}"
+                                                          min="0"
+                                                          max="{{ item.quantity }}"
+                                                          value="0">
+                        </li>
+                        {% for split in item.splits %}
+                            <li>
+                                {{ split.username }} : <input type="number"
+                                                              name="{{ item.uuid }}"
+                                                              min="0"
+                                                              max="{{ item.quantity }}"
+                                                              value="{{ split.quantity }}" disabled>
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit">Submit</button>
+    <button type="button"><a href={{ url_for('show', receipt_uuid=receipt.uuid ) }}>Back</a></button>
+</form>
 {% endif %}
 {% endblock %}

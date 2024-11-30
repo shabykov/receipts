@@ -70,11 +70,12 @@ def receipt_items() -> t.List[ReceiptItem]:
             product="apple",
             quantity=3,
             price=100,
+            split_error_message="receipt item can't be split",
             splits={
                 Split(username="user1"),
                 Split(username="user2")
             }
-        )
+        ),
     ]
 
 

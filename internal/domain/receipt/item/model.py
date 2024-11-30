@@ -4,7 +4,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, UUID4
 
-from internal.domain.receipt.item import ReceiptItemSplitError
 from pkg.datetime import now
 
 
@@ -63,6 +62,9 @@ class ReceiptItem(BaseModel):
     splits: t.Set[Split] = Field(
         default_factory=set
     )
+    split_error_message: str = Field(
+        default=""
+    )
 
     def splits_as_json(self) -> t.List[str]:
         return [s.model_dump_json() for s in self.splits]
@@ -76,15 +78,18 @@ class ReceiptItem(BaseModel):
     def _user_quantity(self, username: str) -> int:
         return sum([split.quantity for split in self.splits if split.username == username])
 
-    def split(self, choice: Choice):
+    def split(self, choice: Choice) -> bool:
         if choice.quantity > self.quantity:
-            raise ReceiptItemSplitError("choice quantity is > itme quantity")
+            self.split_error_message = "choice quantity is > itme quantity"
+            return False
 
         if len(self.splits) == self.quantity:
-            raise ReceiptItemSplitError("receipt item has already split")
+            self.split_error_message = "item has already splitted"
+            return False
 
         if (sum([s.quantity for s in self.splits]) + choice.quantity) > self.quantity:
-            raise ReceiptItemSplitError("receipt item can't be split")
+            self.split_error_message = "item can't be splitted"
+            return False
 
         self.splits.add(
             Split(
@@ -92,6 +97,7 @@ class ReceiptItem(BaseModel):
                 quantity=choice.quantity
             )
         )
+        return True
 
     def is_splittable(self) -> bool:
         if len(self.splits) == self.quantity:

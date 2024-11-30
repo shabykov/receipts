@@ -1,8 +1,9 @@
 import typing as t
 
 from flask import Request, render_template, redirect, url_for
-from pydantic import BaseModel, ValidationError, UUID4
+from pydantic import ValidationError
 
+from internal.domain.user import User
 from internal.domain.receipt import ReceiptReadError
 from internal.domain.receipt.item import ReceiptItemSplitError, Choice
 from internal.usecase.interface import IReceiptReadUC, IReceiptSplitUC, IUserSessionUC
@@ -35,33 +36,26 @@ class SplitHandler:
         except ReceiptReadError as err:
             return render_template(
                 "receipt-split.html",
-                **{"receipt": None, "error": err}
+                **{"receipt": None, "user": user, "error": err}
             )
 
         if request.method == "POST":
-            # TODO: validate CSRF token, validate input
-            param, err = validate(request)
-            if err != "":
+            try:
+                choices = validate(request, user)
+            except ValidationError as err:
                 return render_template(
                     "receipt-split.html",
-                    **{"receipt": receipt, "err": err}
+                    **{"receipt": receipt, "user": user, "err": err}
                 )
-
             try:
                 self.receipt_split_uc.split(
                     receipt,
-                    choices=[
-                        Choice(
-                           username=user.username,
-                           uuid=uuid
-                        )
-                        for uuid in param.receipt_items
-                    ],
+                    choices=choices,
                 )
             except ReceiptItemSplitError as err:
                 return render_template(
                     "receipt-split.html",
-                    **{"receipt": receipt, "error": err}
+                    **{"receipt": receipt, "user": user, "error": err}
                 )
 
         return render_template(
@@ -70,21 +64,12 @@ class SplitHandler:
         )
 
 
-class Body(BaseModel):
-
-    receipt_items: t.List[UUID4]
-
-
-def validate(request: Request) -> (t.Optional[Body], str):
-    receipt_items = request.form.getlist('receipt_items')
-    if not receipt_items:
-        return None, "incorrect receipt_items"
-
-    try:
-        body = Body(
-            receipt_items=receipt_items
+def validate(request: Request, user: User) -> t.List[Choice]:
+    return [
+        Choice(
+            uuid=uuid,
+            quantity=int(quantity),
+            username=user.username,
         )
-    except ValidationError as err:
-        return None, str(err)
-
-    return body, ""
+        for uuid, quantity in request.form.items() if int(quantity) > 0
+    ]
