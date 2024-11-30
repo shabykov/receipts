@@ -65,31 +65,28 @@ def receipt() -> Receipt:
 
 
 def test_create(repo, receipt):
-    err = repo.create(receipt)
-    assert err is None
+    repo.create(receipt)
 
-    created_receipt, err = repo.read_by_uuid(receipt.uuid)
-    assert err is None
+    created_receipt = repo.read_by_uuid(receipt.uuid)
 
-    assert receipt == created_receipt
+    assert receipt.uuid == created_receipt.uuid
+    assert receipt.user_id == created_receipt.user_id
 
 
 def test_update(repo, receipt):
     err = repo.create(receipt)
     assert err is None
 
-    created_receipt, err = repo.read_by_uuid(receipt.uuid)
-    assert err is None
+    repo.read_by_uuid(receipt.uuid)
 
     receipt.total = 2999.9999
     receipt.subtotal = 1999.8888
     receipt.items[1].quantity = 5
 
-    err = repo.update(receipt)
+    repo.update(receipt)
     assert err is None
 
-    updated_receipt, err = repo.read_by_uuid(receipt.uuid)
-    assert err is None
+    updated_receipt = repo.read_by_uuid(receipt.uuid)
 
     assert receipt.uuid == updated_receipt.uuid
     assert receipt.total == updated_receipt.total

@@ -1,6 +1,7 @@
 from telebot import TeleBot
 from telebot.types import Message
 
+from internal.domain.user.id import UserId
 from internal.domain.receipt import ReceiptRecognizeError
 from internal.usecase.interface import IReceiptRecognizeUC
 from .photo.converter import convert
@@ -55,7 +56,7 @@ class Delivery:
     def handle_receipt(self, message: Message):
         try:
             receipt = self.receipt_recognizer_uc.recognize(
-                message.from_user.id,
+                UserId(message.from_user.id),
                 convert(self.bot, message)
             )
         except ReceiptRecognizeError as err:

@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import UUID4
 
+from internal.domain.user.id import UserId
 from internal.domain.image import Image
 from internal.domain.receipt import Receipt
 from internal.domain.receipt.item import Choice
@@ -13,7 +14,7 @@ from internal.domain.user import User
 
 class IReceiptRecognizeUC(ABC):
     @abstractmethod
-    def recognize(self, user_id: int, image: Image) -> Receipt:
+    def recognize(self, user_id: UserId, image: Image) -> Receipt:
         raise NotImplementedError("method `.recognize()` must be implemented")
 
 
@@ -24,7 +25,7 @@ class IReceiptReadUC(ABC):
         raise NotImplementedError("method `.read()` must be implemented")
 
     @abstractmethod
-    def read_many(self, user_id: int, limit: int, offset: int) -> t.List[Receipt]:
+    def read_many(self, user_id: UserId, limit: int, offset: int) -> t.List[Receipt]:
         raise NotImplementedError("method `.read_many()` must be implemented")
 
 
@@ -38,12 +39,8 @@ class IReceiptSplitUC(ABC):
 
 class IUserReadUC(ABC):
     @abstractmethod
-    def get_by_id(self, user_id: int) -> t.Optional[User]:
+    def get_by_id(self, user_id: UserId) -> t.Optional[User]:
         raise NotImplementedError("method `.get_by_id()` must be implemented")
-
-    @abstractmethod
-    def get_by_username(self, username: str) -> User:
-        raise NotImplementedError("method `.get_by_username()` must be implemented")
 
     @abstractmethod
     def get_or_create(self, user: User) -> User:

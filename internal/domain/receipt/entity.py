@@ -5,6 +5,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, UUID4
 
+from internal.domain.user.id import UserId
 from internal.domain.receipt.item import ReceiptItem, Choice
 from pkg.datetime import now
 
@@ -15,7 +16,7 @@ class Result(BaseModel):
 
 
 class Receipt(BaseModel):
-    user_id: int = Field(
+    user_id: UserId = Field(
         default=0
     )
     uuid: UUID4 = Field(
@@ -49,7 +50,7 @@ class Receipt(BaseModel):
         default_factory=now
     )
 
-    def set_user_id(self, user_id: int):
+    def set_user_id(self, user_id: UserId):
         self.user_id = user_id
 
     def is_valid(self) -> bool:

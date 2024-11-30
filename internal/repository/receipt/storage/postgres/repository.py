@@ -152,7 +152,7 @@ class Repository(ICreator, IUpdater, IReader):
                 cur.execute(
                     query=INSERT_RECEIPT_SQL,
                     params={
-                        'user_id': receipt.user_id,
+                        'user_id': receipt.user_id.int(),
                         'uuid': receipt.uuid,
                         'store_name': receipt.store_name,
                         'store_addr': receipt.store_addr,
@@ -188,7 +188,7 @@ class Repository(ICreator, IUpdater, IReader):
                 cur.execute(
                     query=UPSERT_RECEIPT_SQL,
                     params={
-                        'user_id': receipt.user_id,
+                        'user_id': receipt.user_id.int(),
                         'uuid': receipt.uuid,
                         'store_name': receipt.store_name,
                         'store_addr': receipt.store_addr,

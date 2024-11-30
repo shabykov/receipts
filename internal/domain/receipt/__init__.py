@@ -5,7 +5,7 @@ from .error import (
     ReceiptUpdateError,
     ReceiptItemsAlreadySplited,
 )
-from .model import Receipt, ReceiptItem, new
+from .entity import Receipt, ReceiptItem, new
 
 __all__ = (
     'new',

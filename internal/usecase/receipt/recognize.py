@@ -1,5 +1,6 @@
 from logging import getLogger
 
+from internal.domain.user.id import UserId
 from internal.domain.image import Image
 from internal.domain.receipt import Receipt
 from internal.usecase.interface import IReceiptRecognizeUC
@@ -13,7 +14,7 @@ class ReceiptRecognizeUseCase(IReceiptRecognizeUC):
         self._recognizer = recognizer
         self._creator = creator
 
-    def recognize(self, user_id: int, image: Image) -> Receipt:
+    def recognize(self, user_id: UserId, image: Image) -> Receipt:
         receipt = self._recognizer.recognize(image)
         if receipt.is_valid():
             receipt.set_user_id(user_id)

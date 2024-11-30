@@ -10,6 +10,8 @@ from flask import (
 from pydantic import ValidationError
 
 from internal.domain.user import new
+from internal.domain.user.id import UserId
+from internal.domain.user.username import Username
 from internal.usecase.interface import IUserReadUC
 from pkg.auth.telegram import TelegramAuth, AuthData
 
@@ -52,7 +54,7 @@ class LoginHandler:
         if self.auth.authenticate(data):
             # create user
             user = self.user_uc.get_or_create(
-                new(data.id, data.username)
+                new(UserId(data.id), Username(data.username))
             )
 
             # set cookie

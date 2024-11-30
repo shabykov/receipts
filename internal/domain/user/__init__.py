@@ -1,5 +1,5 @@
-from ._error import UserCreateError, UserReadError
-from ._model import User, new, new_user_by_username, new_unknown_user
+from .error import UserCreateError, UserReadError
+from .entity import User, new, new_user_by_username, new_unknown_user
 
 __all__ = (
     "new",

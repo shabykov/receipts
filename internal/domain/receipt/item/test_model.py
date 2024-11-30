@@ -2,7 +2,6 @@ import uuid
 
 import pytest
 
-from .error import ReceiptItemSplitError
 from .model import ReceiptItem, Choice
 
 
@@ -49,10 +48,8 @@ def test_split(receipt_item_uuid, choice1, choice2, choice3):
     assert len(item.splits) == 2
     assert "user2" in item.splits
 
-    with pytest.raises(ReceiptItemSplitError) as err:
-        item.split(choice3)
-
-    assert "receipt item can't be split" in str(err.value)
+    assert item.split(choice3) is False
+    assert item.split_error_message == "item can't be splitted"
 
 
 def test_is_splittable(receipt_item_uuid, choice1, choice2):

@@ -3,6 +3,8 @@ import typing as t
 import psycopg
 
 from internal.domain.user import User, UserCreateError, UserReadError
+from internal.domain.user.id import UserId
+from internal.domain.user.username import Username
 from internal.usecase.adapters.user import IReader, ICreator
 
 CREATE_SCHEMA_SQL = b"""
@@ -56,13 +58,13 @@ class Repository(IReader, ICreator):
             cur.execute(query=CREATE_SCHEMA_SQL)
         self._conn.commit()
 
-    def read_by_id(self, user_id: int) -> t.Optional[User]:
+    def read_by_id(self, user_id: UserId) -> t.Optional[User]:
         try:
             with self._conn.cursor() as cur:
                 cur.execute(
                     SELECT_BY_USER_ID_SQL,
                     params={
-                        "user_id": str(user_id)
+                        "user_id": user_id.string()
                     }
                 )
                 row = cur.fetchone()
@@ -79,13 +81,13 @@ class Repository(IReader, ICreator):
         )
         return ret
 
-    def read_by_username(self, username: str) -> t.Optional[User]:
+    def read_by_username(self, username: Username) -> t.Optional[User]:
         try:
             with self._conn.cursor() as cur:
                 cur.execute(
                     SELECT_BY_USERNAME_SQL,
                     params={
-                        "username": username
+                        "username": username.string()
                     }
                 )
                 row = cur.fetchone()
@@ -109,8 +111,8 @@ class Repository(IReader, ICreator):
                 cur.execute(
                     query=INSERT_SQL,
                     params={
-                        'user_id': user.user_id,
-                        'username': user.username,
+                        'user_id': user.user_id.int(),
+                        'username': user.username.string(),
                         'created_at': user.created_at
                     }
                 )

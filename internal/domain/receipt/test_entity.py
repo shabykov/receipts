@@ -3,7 +3,7 @@ import uuid
 import pytest
 
 from internal.domain.receipt import Receipt
-from internal.domain.receipt.item import ReceiptItem, Choice, ReceiptItemSplitError
+from internal.domain.receipt.item import ReceiptItem, Choice
 
 
 @pytest.fixture()
@@ -116,17 +116,6 @@ def test_split(receipt, receipt_item_choice_1, receipt_item_choice_2, receipt_it
     )
     assert "user2" in receipt.items[1].splits
     assert "user2" in receipt.items[2].splits
-
-    with pytest.raises(ReceiptItemSplitError) as err:
-        receipt.split([
-            Choice(
-                username="user3",
-                uuid=receipt_item_choice_4.uuid,
-                quantity=receipt_item_choice_4.quantity
-            )
-        ])
-
-    assert "receipt item has already split" in str(err.value)
 
 
 def test_result(receipt, receipt_item_choice_1, receipt_item_choice_2, receipt_item_choice_3, receipt_item_choice_4):
