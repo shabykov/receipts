@@ -29,7 +29,7 @@ default_content_prefix = (
 )
 
 
-class Repository(IRecognizer):
+class OpenIAChatV1(IRecognizer):
     def __init__(self, client: OpenAI, extractor: ImageExtractor, model: str = default_model):
         self._client = instructor.patch(client)
         self._extractor = extractor

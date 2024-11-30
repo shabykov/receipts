@@ -54,3 +54,4 @@ typing_extensions==4.11.0
 urllib3==2.2.1
 Werkzeug==3.0.3
 yarl==1.9.4
+ollama==0.4.2

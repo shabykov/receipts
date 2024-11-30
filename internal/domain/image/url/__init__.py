@@ -1,3 +1,3 @@
-from .model import URL
+from .value_object import URL
 
 __all__ = ('URL',)

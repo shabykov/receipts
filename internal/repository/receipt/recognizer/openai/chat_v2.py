@@ -53,7 +53,7 @@ system_prompt = """
     """
 
 
-class Repository(IRecognizer):
+class OpenIAChatV2(IRecognizer):
     def __init__(self, client: OpenAI, model: str = default_model):
         self._client = instructor.patch(client)
         self._model = model
@@ -89,7 +89,7 @@ def make_messages(image: Image) -> list[dict[str, str]]:
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": image.url(),
+                        "url": image.url().string(),
                         "detail": "high"
                     }
                 }

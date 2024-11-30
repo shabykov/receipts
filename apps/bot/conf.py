@@ -27,6 +27,7 @@ class Settings(BaseSettings, case_sensitive=False):
     openai_api_key: SecretStr
     openai_api_url: HttpUrl
     openai_model: str
+    ollama_model: str
     postgresql_url: PostgresDsn
 
 

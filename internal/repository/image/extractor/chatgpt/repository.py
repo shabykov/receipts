@@ -91,7 +91,7 @@ def payload(image: Image, model: str) -> dict:
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": image.url()
+                            "url": image.url().string()
                         }
                     }
                 ]
