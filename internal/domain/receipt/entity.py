@@ -3,10 +3,11 @@ import uuid
 from collections import defaultdict
 from datetime import datetime
 
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel, Field
 
-from internal.domain.user.id import UserId
 from internal.domain.receipt.item import ReceiptItem, Choice
+from internal.domain.receipt.uuid import ReceiptUUID
+from internal.domain.user.id import UserId
 from pkg.datetime import now
 
 
@@ -19,8 +20,8 @@ class Receipt(BaseModel):
     user_id: UserId = Field(
         default=0
     )
-    uuid: UUID4 = Field(
-        default_factory=uuid.uuid4
+    uuid: ReceiptUUID = Field(
+        default_factory=lambda: ReceiptUUID(uuid.uuid4())
     )
     store_name: str = Field(
         default="unknown"

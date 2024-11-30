@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for
 
 from internal.domain.receipt import ReceiptReadError
+from internal.domain.receipt.uuid import ReceiptUUID
 from internal.usecase.interface import IReceiptReadUC, IUserSessionUC
 
 
@@ -25,7 +26,9 @@ class ShowHandler:
             )
 
         try:
-            receipt = self.receipt_reader_uc.read(receipt_uuid)
+            receipt = self.receipt_reader_uc.read(
+                ReceiptUUID(receipt_uuid)
+            )
         except ReceiptReadError as err:
             return render_template(
                 "receipt-err.html",

@@ -3,9 +3,9 @@ import uuid
 
 import psycopg
 import pytest
-from pydantic import UUID4
 
 from internal.domain.receipt.item import ReceiptItem, Split, Choice
+from internal.domain.receipt.uuid import ReceiptUUID
 from internal.repository.receipt_item.storage.postgres.repository import Repository
 
 
@@ -28,8 +28,8 @@ def repo(conn) -> Repository:
 
 
 @pytest.fixture(scope="function")
-def receipt_uuid() -> UUID4:
-    return uuid.uuid4()
+def receipt_uuid() -> ReceiptUUID:
+    return ReceiptUUID(uuid.uuid4())
 
 
 @pytest.fixture(scope="function")
@@ -80,7 +80,6 @@ def receipt_items() -> t.List[ReceiptItem]:
 
 
 def test_create_many(repo, receipt_uuid, receipt_items):
-
     repo.create_many(receipt_uuid, receipt_items)
 
     created_items = repo.read_by_receipt_uuid(receipt_uuid)
@@ -89,7 +88,6 @@ def test_create_many(repo, receipt_uuid, receipt_items):
 
 
 def test_update_many(repo, receipt_uuid, receipt_items):
-
     repo.create_many(receipt_uuid, receipt_items)
 
     receipt_items[1].product = "new name"

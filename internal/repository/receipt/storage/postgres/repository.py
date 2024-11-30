@@ -2,7 +2,6 @@ import typing as t
 from logging import getLogger
 
 import psycopg
-from pydantic import UUID4
 
 from internal.domain.receipt import (
     Receipt,
@@ -10,6 +9,8 @@ from internal.domain.receipt import (
     ReceiptCreateError,
     ReceiptUpdateError,
 )
+from internal.domain.user.id import UserId
+from internal.domain.receipt.uuid import ReceiptUUID
 from internal.domain.receipt.item import (
     ReceiptItemCreateError,
     ReceiptItemReadError,
@@ -153,7 +154,7 @@ class Repository(ICreator, IUpdater, IReader):
                     query=INSERT_RECEIPT_SQL,
                     params={
                         'user_id': receipt.user_id.int(),
-                        'uuid': receipt.uuid,
+                        'uuid': receipt.uuid.string(),
                         'store_name': receipt.store_name,
                         'store_addr': receipt.store_addr,
                         'date': receipt.date,
@@ -189,7 +190,7 @@ class Repository(ICreator, IUpdater, IReader):
                     query=UPSERT_RECEIPT_SQL,
                     params={
                         'user_id': receipt.user_id.int(),
-                        'uuid': receipt.uuid,
+                        'uuid': receipt.uuid.string(),
                         'store_name': receipt.store_name,
                         'store_addr': receipt.store_addr,
                         'date': receipt.date,
@@ -211,7 +212,7 @@ class Repository(ICreator, IUpdater, IReader):
 
         return None
 
-    def read_by_uuid(self, uuid: UUID4) -> t.Optional[Receipt]:
+    def read_by_uuid(self, uuid: ReceiptUUID) -> t.Optional[Receipt]:
         try:
             items = self._item_repo.read_by_receipt_uuid(uuid)
         except ReceiptItemReadError as err:
@@ -245,5 +246,5 @@ class Repository(ICreator, IUpdater, IReader):
         ret.items = items
         return ret
 
-    def read_many(self, user_id: int, limit: int, offset: int) -> t.List[Receipt]:
+    def read_many(self, user_id: UserId, limit: int, offset: int) -> t.List[Receipt]:
         return []

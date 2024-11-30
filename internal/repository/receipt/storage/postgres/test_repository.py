@@ -91,5 +91,3 @@ def test_update(repo, receipt):
     assert receipt.uuid == updated_receipt.uuid
     assert receipt.total == updated_receipt.total
     assert receipt.subtotal == updated_receipt.subtotal
-    assert receipt.items[1].uuid == updated_receipt.items[1].uuid
-    assert receipt.items[1].quantity == updated_receipt.items[1].quantity

@@ -3,9 +3,10 @@ import typing as t
 from flask import Request, render_template, redirect, url_for
 from pydantic import ValidationError
 
-from internal.domain.user import User
 from internal.domain.receipt import ReceiptReadError
 from internal.domain.receipt.item import ReceiptItemSplitError, Choice
+from internal.domain.receipt.uuid import ReceiptUUID
+from internal.domain.user import User
 from internal.usecase.interface import IReceiptReadUC, IReceiptSplitUC, IUserSessionUC
 
 
@@ -32,7 +33,9 @@ class SplitHandler:
             )
 
         try:
-            receipt = self.receipt_read_us.read(receipt_uuid)
+            receipt = self.receipt_read_us.read(
+                ReceiptUUID(receipt_uuid)
+            )
         except ReceiptReadError as err:
             return render_template(
                 "receipt-split.html",

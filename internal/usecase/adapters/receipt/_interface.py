@@ -1,9 +1,10 @@
 import typing as t
 from abc import ABC, abstractmethod
 
-from pydantic import UUID4
 from internal.domain.image import Image
+from internal.domain.user.id import UserId
 from internal.domain.receipt import Receipt
+from internal.domain.receipt.uuid import ReceiptUUID
 
 
 class ICreator(ABC):
@@ -20,11 +21,11 @@ class IUpdater(ABC):
 
 class IReader(ABC):
     @abstractmethod
-    def read_by_uuid(self, uuid: UUID4) -> t.Optional[Receipt]:
+    def read_by_uuid(self, uuid: ReceiptUUID) -> t.Optional[Receipt]:
         raise NotImplementedError("method `.read_by_uuid()` must be implemented")
 
     @abstractmethod
-    def read_many(self, user_id: int, limit: int, offset: int) -> t.List[Receipt]:
+    def read_many(self, user_id: UserId, limit: int, offset: int) -> t.List[Receipt]:
         raise NotImplementedError("method `.read_many()` must be implemented")
 
 
