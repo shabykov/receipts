@@ -1,32 +1,54 @@
 import typing as t
-
-from pydantic import BaseModel, ValidationError
+import json
+from pydantic import BaseModel, Field
 
 from internal.domain.receipt import Receipt, ReceiptItem, new
 
 
 class ReceiptItemDTO(BaseModel):
-    name: str
-    quantity: int
-    price: float
+    name: t.Optional[str] = Field(
+        default="unknown"
+    )
+    quantity: t.Optional[int] = Field(
+        default=0
+    )
+    price: t.Optional[float] = Field(
+        default=0
+    )
 
 
 class ReceiptDTO(BaseModel):
-    store_name: str
-    store_addr: str
-    date: str
-    time: str
-    items: t.List[ReceiptItemDTO]
-    subtotal: float
-    tips: float
-    total: float
+    store_name: t.Optional[str] = Field(
+        default="unknown"
+    )
+    store_address: t.Optional[str] = Field(
+        default="unknown"
+    )
+    date: t.Optional[str] = Field(
+        default="unknown"
+    )
+    time: t.Optional[str] = Field(
+        default="unknown"
+    )
+    products: t.List[ReceiptItemDTO]
+    subtotal: t.Optional[float] = Field(
+        default=0
+    )
+    tips: t.Optional[float] = Field(
+        default=0
+    )
+    total: t.Optional[float] = Field(
+        default=0
+    )
 
 
 def convert(receipt_data: dict) -> Receipt:
-    data = ReceiptDTO(**receipt_data)
+    data = ReceiptDTO(
+        **json.loads(receipt_data['content'])
+    )
     return new(
-        store_name=data.store_name,
-        store_addr=data.store_addr,
+        store_name=data.store,
+        store_addr=data.address,
         time=data.time,
         date=data.date,
         items=convert_products(data.items),

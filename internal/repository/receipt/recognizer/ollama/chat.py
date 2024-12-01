@@ -15,7 +15,7 @@ from internal.domain.receipt import (
 )
 from internal.usecase.adapters.receipt import IRecognizer
 
-from .dto import convert
+from .dto import convert, ReceiptDTO
 
 logger = getLogger("receipt.recognizer.catgpt")
 
@@ -23,8 +23,8 @@ default_role = "user"
 default_model = "llama3.2-vision"
 default_format = "json"
 default_content_prefix = (
-    "Extract store name, store address, date, time, products (name, quantity, price), "
-    "subtotal, tips and total amount from from the following receipt description json:%s"
+    "Extract store_name, store_address, date, time, products (name, quantity, price), "
+    "subtotal, tips, total from the following receipt. Respond using JSON schema: %s"
 )
 
 system_role = "system"
@@ -63,7 +63,7 @@ class OllamaChat(IRecognizer):
         receipt_data: ChatResponse = chat(
             model=self._model,
             format=default_format,
-            messages=make_messages(image)
+            messages=make_messages(image),
         )
 
         if receipt_data.message.content:
@@ -86,6 +86,8 @@ def make_messages(image: Image) -> list[dict[str, str]]:
             "images": [
                 image.data()
             ],
-            "content": default_content_prefix
+            "content": default_content_prefix.format(
+                ReceiptDTO.model_json_schema()
+            )
         }
     ]
