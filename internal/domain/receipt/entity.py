@@ -14,6 +14,9 @@ from pkg.datetime import now
 class Result(BaseModel):
     username: str
     amount: float
+    tips: float = Field(
+        default=0.0
+    )
 
 
 class Receipt(BaseModel):
@@ -38,13 +41,13 @@ class Receipt(BaseModel):
     items: t.List[ReceiptItem] = Field(
         default=[]
     )
-    subtotal: float = Field(
+    subtotal: t.Optional[float] = Field(
         default=0
     )
-    tips: float = Field(
+    tips: t.Optional[float] = Field(
         default=0
     )
-    total: float = Field(
+    total: t.Optional[float] = Field(
         default=0
     )
     created_at: datetime = Field(
@@ -61,6 +64,7 @@ class Receipt(BaseModel):
     def is_splitted(self) -> bool:
         return all([item.is_splittable() for item in self.items])
 
+    @property
     def results(self) -> t.List[Result]:
 
         results = defaultdict(Result)
@@ -97,12 +101,12 @@ def new(
         subtotal: float,
         total: float) -> Receipt:
     return Receipt(
-        store_name=store_name,
-        store_addr=store_addr,
-        time=time,
-        date=date,
+        store_name=store_name if store_name else "unknown",
+        store_addr=store_addr if store_addr else "unknown",
+        time=time if time else "unknown",
+        date=date if date else "unknown",
         items=items,
-        tips=tips,
-        subtotal=subtotal,
-        total=total,
+        tips=tips if tips else 0,
+        subtotal=subtotal if subtotal else 0,
+        total=total if total else 0,
     )

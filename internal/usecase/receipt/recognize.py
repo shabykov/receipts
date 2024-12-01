@@ -20,11 +20,11 @@ class ReceiptRecognizeUseCase(IReceiptRecognizeUC):
             receipt.set_user_id(user_id)
             self._creator.create(receipt)
             logger.info(
-                "receipt successfully recognized: user_id=%d, image_url=%s" % (user_id, image.url())
+                "receipt successfully recognized: user_id=%s, image_url=%s" % (user_id, image.url())
             )
             return receipt
 
         logger.warning(
-            "recognized receipt is invalid: user_id=%d, image_url=%s" % (user_id, image.url())
+            "recognized receipt is invalid: user_id=%s, image_url=%s" % (user_id, image.url())
         )
         return receipt

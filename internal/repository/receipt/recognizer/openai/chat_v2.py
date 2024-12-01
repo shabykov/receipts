@@ -66,8 +66,6 @@ class OpenIAChatV2(IRecognizer):
             temperature=0.0,
         )
         if isinstance(receipt_data, ReceiptDTO):
-            logger.info("receipt successfully recognized: receipt_data=%s" % receipt_data)
-
             return convert(receipt_data)
 
         raise ReceiptRecognizeError("unable to recognize receipt image")

@@ -58,7 +58,7 @@ class LoginHandler:
             )
 
             # set cookie
-            session["user_id"] = user.user_id
+            session["user_id"] = user.user_id.int()
 
             if request.args.get("receipt_uuid"):
                 return redirect(

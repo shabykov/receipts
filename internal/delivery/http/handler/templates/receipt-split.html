@@ -37,7 +37,7 @@
                         {% for split in item.splits %}
                             {% if split.username != user.username %}
                                 <li>
-                                    {{ user.username }} : <input type="number"
+                                    {{ split.username }} : <input type="number"
                                                                   name="{{ item.uuid }}"
                                                                   min="0"
                                                                   max="{{ item.quantity }}"
@@ -75,6 +75,32 @@
             </td>
         </tr>
         {% endfor %}
+        <tr>
+            <td>Sums</td>
+            <td></td>
+            <td></td>
+            <td>
+                <ul>
+                    <li> Subtotal : {{ receipt.subtotal }}</li>
+                    <li> Tips : {{ receipt.tips }}</li>
+                    <li> Total : {{ receipt.total }}</li>
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Splits</td>
+            <td></td>
+            <td></td>
+            <td>
+                <ul>
+                    {% for result in receipt.results %}
+                    <li>
+                        {{ result.username }} : {{ result.amount }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
         </tbody>
     </table>
     <button type="submit">Submit</button>

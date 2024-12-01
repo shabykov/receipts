@@ -72,7 +72,7 @@ def validate(request: Request, user: User) -> t.List[Choice]:
         Choice(
             uuid=uuid,
             quantity=int(quantity),
-            username=user.username,
+            username=user.username.string(),
         )
         for uuid, quantity in request.form.items() if int(quantity) > 0
     ]

@@ -47,13 +47,13 @@ class ReceiptItem(BaseModel):
     uuid: UUID4 = Field(
         default_factory=uuid.uuid4
     )
-    product: str = Field(
+    product: t.Optional[str] = Field(
         default="unknown"
     )
-    quantity: int = Field(
+    quantity: t.Optional[int] = Field(
         default=0
     )
-    price: float = Field(
+    price: t.Optional[float] = Field(
         default=0
     )
     created_at: datetime = Field(

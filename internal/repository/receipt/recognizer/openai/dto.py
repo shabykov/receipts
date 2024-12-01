@@ -1,6 +1,6 @@
 import typing as t
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from internal.domain.receipt import Receipt, ReceiptItem, new
 
@@ -12,10 +12,18 @@ class ReceiptItemDTO(BaseModel):
 
 
 class ReceiptDTO(BaseModel):
-    store_name: str
-    store_addr: str
-    date: str
-    time: str
+    store_name: t.Optional[str] = Field(
+        default="unknown"
+    )
+    store_addr: t.Optional[str] = Field(
+        default="unknown"
+    )
+    date: t.Optional[str] = Field(
+        default="unknown"
+    )
+    time: t.Optional[str] = Field(
+        default="unknown"
+    )
     items: t.List[ReceiptItemDTO]
     subtotal: float
     tips: float
