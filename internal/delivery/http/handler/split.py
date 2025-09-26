@@ -22,15 +22,15 @@ class SplitHandler:
         self.receipt_split_uc = receipt_split_uc
 
     def split(self, receipt_uuid: str, request: Request):
-        # user = self.user_session_uc.check()
-        # if not user:
-        #     return redirect(
-        #         url_for(
-        #             endpoint='login',
-        #             receipt_uuid=receipt_uuid,
-        #             error="user is not authenticated"
-        #         )
-        #     )
+        user = self.user_session_uc.check()
+        if not user:
+            return redirect(
+                url_for(
+                    endpoint='login',
+                    receipt_uuid=receipt_uuid,
+                    error="user is not authenticated"
+                )
+            )
 
         try:
             receipt = self.receipt_read_us.read(
