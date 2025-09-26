@@ -15,15 +15,15 @@ class ShowHandler:
         self.receipt_reader_uc = receipt_reader_uc
 
     def show(self, receipt_uuid: str):
-        user = self.user_session_uc.check()
-        if not user:
-            return redirect(
-                url_for(
-                    endpoint='login',
-                    receipt_uuid=receipt_uuid,
-                    error="user is not authenticated"
-                )
-            )
+        # user = self.user_session_uc.check()
+        # if not user:
+        #     return redirect(
+        #         url_for(
+        #             endpoint='login',
+        #             receipt_uuid=receipt_uuid,
+        #             error="user is not authenticated"
+        #         )
+        #     )
 
         try:
             receipt = self.receipt_reader_uc.read(

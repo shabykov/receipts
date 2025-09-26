@@ -6,7 +6,7 @@ from logging import getLogger
 from pkg.log import init_logging
 from internal.delivery.telegram_bot.delivery import Delivery
 from internal.repository.receipt.recognizer.ollama.chat import OllamaChat
-# from internal.repository.receipt.recognizer.openai.chat_v2 import OpenIAChatV2
+from internal.repository.receipt.recognizer.openai.chat_v2 import OpenIAChatV2
 from internal.repository.receipt.storage.postgres.repository import Repository as ReceiptStorage
 from internal.repository.receipt_item.storage.postgres.repository import Repository as ReceiptItemStorage
 from internal.usecase.receipt.recognize import ReceiptRecognizeUseCase
@@ -30,7 +30,8 @@ openai_client = OpenAI(
 postgresql_conn = connect(
     conninfo=settings.postgresql_url.unicode_string()
 )
-receipt_recognizer = OllamaChat(
+receipt_recognizer = OpenIAChatV2(
+    openai_client,
     model=settings.ollama_model
 )
 receipt_item_storage = ReceiptItemStorage(
