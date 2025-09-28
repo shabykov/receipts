@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for
 
 from internal.domain.receipt import ReceiptReadError
-from internal.domain.receipt.uuid import ReceiptUUID
+from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.usecase.interface import IReceiptReadUC, IUserSessionUC
 
 

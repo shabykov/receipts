@@ -147,3 +147,9 @@ def test_result(receipt, receipt_item_choice_1, receipt_item_choice_2, receipt_i
     assert splits[0].amount == 1000 + 500 + 1000 / 3 + 1000
     assert splits[1].username == "user2"
     assert splits[1].amount == 500 + 1000 / 3
+
+
+def test_dump(receipt):
+
+    resp = receipt.model_dump()
+    assert resp

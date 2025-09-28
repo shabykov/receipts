@@ -5,7 +5,7 @@ from pydantic import ValidationError
 
 from internal.domain.receipt import ReceiptReadError
 from internal.domain.receipt.item import ReceiptItemSplitError, Choice
-from internal.domain.receipt.uuid import ReceiptUUID
+from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.domain.user import User
 from internal.usecase.interface import IReceiptReadUC, IReceiptSplitUC, IUserSessionUC
 

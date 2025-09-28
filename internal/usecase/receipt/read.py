@@ -1,7 +1,7 @@
 import typing as t
 
 from internal.domain.receipt import Receipt
-from internal.domain.receipt.uuid import ReceiptUUID
+from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.domain.user.id import UserId
 from internal.usecase.adapters.receipt import IReader
 from internal.usecase.interface import IReceiptReadUC

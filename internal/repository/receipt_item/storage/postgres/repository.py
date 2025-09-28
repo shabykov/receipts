@@ -4,7 +4,7 @@ from logging import getLogger
 import psycopg
 from pydantic import UUID4
 
-from internal.domain.receipt.uuid import ReceiptUUID
+from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.domain.receipt.item import ReceiptItem, Split
 from internal.domain.receipt.item import (
     ReceiptItemCreateError,

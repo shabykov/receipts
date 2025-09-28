@@ -5,10 +5,11 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from internal.domain.receipt.item import ReceiptItem, Choice
-from internal.domain.receipt.uuid import ReceiptUUID
 from internal.domain.user.id import UserId
 from pkg.datetime import now
+
+from .item import ReceiptItem, Choice
+from .receipt_uuid import ReceiptUUID
 
 
 class Result(BaseModel):

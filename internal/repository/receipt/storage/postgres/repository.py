@@ -10,7 +10,7 @@ from internal.domain.receipt import (
     ReceiptUpdateError,
 )
 from internal.domain.user.id import UserId
-from internal.domain.receipt.uuid import ReceiptUUID
+from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.domain.receipt.item import (
     ReceiptItemCreateError,
     ReceiptItemReadError,

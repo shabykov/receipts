@@ -5,7 +5,7 @@ import psycopg
 import pytest
 
 from internal.domain.receipt.item import ReceiptItem, Split, Choice
-from internal.domain.receipt.uuid import ReceiptUUID
+from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.repository.receipt_item.storage.postgres.repository import Repository
 
 
