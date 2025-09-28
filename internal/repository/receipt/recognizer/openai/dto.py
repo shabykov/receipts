@@ -6,9 +6,15 @@ from internal.domain.receipt import Receipt, ReceiptItem, new
 
 
 class ReceiptItemDTO(BaseModel):
-    name: str
-    quantity: int
-    price: float
+    name: t.Optional[str] = Field(
+        default="unknown"
+    )
+    quantity: t.Optional[int] = Field(
+        default=0
+    )
+    price: t.Optional[float] = Field(
+        default=0
+    )
 
 
 class ReceiptDTO(BaseModel):
@@ -24,10 +30,18 @@ class ReceiptDTO(BaseModel):
     time: t.Optional[str] = Field(
         default="unknown"
     )
+
     items: t.List[ReceiptItemDTO]
-    subtotal: float
-    tips: float
-    total: float
+
+    subtotal: t.Optional[float] = Field(
+        default=0
+    )
+    tips: t.Optional[float] = Field(
+        default=0
+    )
+    total: t.Optional[float] = Field(
+        default=0
+    )
 
 
 def convert(data: ReceiptDTO) -> Receipt:

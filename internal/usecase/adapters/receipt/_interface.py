@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from internal.domain.image import Image
 from internal.domain.user.id import UserId
 from internal.domain.receipt import Receipt
-from internal.domain.receipt.uuid import ReceiptUUID
+from internal.domain.receipt.receipt_uuid import ReceiptUUID
 
 
 class ICreator(ABC):
