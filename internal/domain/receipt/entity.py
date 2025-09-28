@@ -3,13 +3,11 @@ import uuid
 from collections import defaultdict
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, UUID4, field_serializer
 
+from internal.domain.receipt.item import ReceiptItem, Choice
 from internal.domain.user.id import UserId
 from pkg.datetime import now
-
-from .item import ReceiptItem, Choice
-from .receipt_uuid import ReceiptUUID
 
 
 class Result(BaseModel):
@@ -24,8 +22,8 @@ class Receipt(BaseModel):
     user_id: UserId = Field(
         default=0
     )
-    uuid: ReceiptUUID = Field(
-        default_factory=lambda: ReceiptUUID(uuid.uuid4())
+    uuid: UUID4 = Field(
+        default_factory=uuid.uuid4
     )
     store_name: str = Field(
         default="unknown"
@@ -54,6 +52,14 @@ class Receipt(BaseModel):
     created_at: datetime = Field(
         default_factory=now
     )
+
+    @field_serializer('uuid')
+    def serialize_uuid(self, uuid: UUID4) -> str:
+        return str(uuid)
+
+    @field_serializer('created_at')
+    def serialize_timestamp(self, dt: datetime) -> str:
+        return dt.isoformat()
 
     def set_user_id(self, user_id: UserId):
         self.user_id = user_id

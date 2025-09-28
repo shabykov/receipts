@@ -1,5 +1,6 @@
 import typing as t
 from logging import getLogger
+from pydantic import UUID4
 
 import psycopg
 
@@ -10,7 +11,6 @@ from internal.domain.receipt import (
     ReceiptUpdateError,
 )
 from internal.domain.user.id import UserId
-from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.domain.receipt.item import (
     ReceiptItemCreateError,
     ReceiptItemReadError,
@@ -154,7 +154,7 @@ class Repository(ICreator, IUpdater, IReader):
                     query=INSERT_RECEIPT_SQL,
                     params={
                         'user_id': receipt.user_id.int(),
-                        'uuid': receipt.uuid.string(),
+                        'uuid': str(receipt.uuid),
                         'store_name': receipt.store_name,
                         'store_addr': receipt.store_addr,
                         'date': receipt.date,
@@ -190,7 +190,7 @@ class Repository(ICreator, IUpdater, IReader):
                     query=UPSERT_RECEIPT_SQL,
                     params={
                         'user_id': receipt.user_id.int(),
-                        'uuid': receipt.uuid.string(),
+                        'uuid': str(receipt.uuid),
                         'store_name': receipt.store_name,
                         'store_addr': receipt.store_addr,
                         'date': receipt.date,
@@ -212,7 +212,7 @@ class Repository(ICreator, IUpdater, IReader):
 
         return None
 
-    def read_by_uuid(self, uuid: ReceiptUUID) -> t.Optional[Receipt]:
+    def read_by_uuid(self, uuid: UUID4) -> t.Optional[Receipt]:
         try:
             items = self._item_repo.read_by_receipt_uuid(uuid)
         except ReceiptItemReadError as err:

@@ -4,7 +4,6 @@ from logging import getLogger
 import psycopg
 from pydantic import UUID4
 
-from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.domain.receipt.item import ReceiptItem, Split
 from internal.domain.receipt.item import (
     ReceiptItemCreateError,
@@ -146,7 +145,7 @@ class Repository(ICreator, IUpdater, IReader):
         self._conn.commit()
         logger.info("receipt item schema cleaned")
 
-    def create_many(self, receipt_uuid: ReceiptUUID, receipt_items: t.List[ReceiptItem]):
+    def create_many(self, receipt_uuid: UUID4, receipt_items: t.List[ReceiptItem]):
         try:
             with self._conn.cursor() as cur:
                 cur.executemany(
@@ -163,7 +162,7 @@ class Repository(ICreator, IUpdater, IReader):
                     query=INSERT_RECEIPT_ITEM_SQL,
                     params_seq=[
                         (
-                            receipt_uuid.string(),
+                            receipt_uuid,
                             item.uuid,
                             item.product,
                             item.quantity,
@@ -183,7 +182,7 @@ class Repository(ICreator, IUpdater, IReader):
             )
         return None
 
-    def update_many(self, receipt_uuid: ReceiptUUID, receipt_items: t.List[ReceiptItem]):
+    def update_many(self, receipt_uuid: UUID4, receipt_items: t.List[ReceiptItem]):
         try:
             with self._conn.cursor() as cur:
                 cur.executemany(
@@ -200,7 +199,7 @@ class Repository(ICreator, IUpdater, IReader):
                     query=UPSERT_RECEIPT_ITEM_SQL,
                     params_seq=[
                         (
-                            receipt_uuid.string(),
+                            receipt_uuid,
                             item.uuid,
                             item.product,
                             item.quantity,
@@ -243,14 +242,14 @@ class Repository(ICreator, IUpdater, IReader):
             splits=parse_splits(row[6])
         )
 
-    def read_by_receipt_uuid(self, receipt_uuid: ReceiptUUID) -> t.List[ReceiptItem]:
+    def read_by_receipt_uuid(self, receipt_uuid: UUID4) -> t.List[ReceiptItem]:
         receipt_items = []
         try:
             with self._conn.cursor() as cur:
                 cur.execute(
                     SELECT_RECEIPT_ITEMS_SQL,
                     params={
-                        "receipt_uuid": receipt_uuid.string(),
+                        "receipt_uuid": str(receipt_uuid),
                     }
                 )
                 for row in cur:

@@ -151,5 +151,5 @@ def test_result(receipt, receipt_item_choice_1, receipt_item_choice_2, receipt_i
 
 def test_dump(receipt):
 
-    resp = receipt.model_dump()
+    resp = receipt.model_dump_json()
     assert resp

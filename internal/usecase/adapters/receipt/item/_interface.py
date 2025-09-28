@@ -1,8 +1,7 @@
 import typing as t
 from abc import ABC, abstractmethod
+from pydantic import UUID4
 
-
-from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.domain.receipt.item import ReceiptItem
 
 
@@ -14,11 +13,11 @@ class ICreator(ABC):
 
 class IUpdater(ABC):
     @abstractmethod
-    def update_many(self, receipt_uuid: ReceiptUUID, items: t.List[ReceiptItem]):
+    def update_many(self, receipt_uuid: UUID4, items: t.List[ReceiptItem]):
         raise NotImplementedError("method `.update_many()` must be implemented")
 
 
 class IReader(ABC):
     @abstractmethod
-    def read_by_receipt_uuid(self, receipt_uuid: ReceiptUUID) -> t.List[ReceiptItem]:
+    def read_by_receipt_uuid(self, receipt_uuid: UUID4) -> t.List[ReceiptItem]:
         raise NotImplementedError("method `.read_many()` must be implemented")
