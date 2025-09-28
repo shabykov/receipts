@@ -4,8 +4,9 @@ import uuid
 import psycopg
 import pytest
 
+from pydantic import UUID4
+
 from internal.domain.receipt.item import ReceiptItem, Split, Choice
-from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.repository.receipt_item.storage.postgres.repository import Repository
 
 
@@ -28,8 +29,8 @@ def repo(conn) -> Repository:
 
 
 @pytest.fixture(scope="function")
-def receipt_uuid() -> ReceiptUUID:
-    return ReceiptUUID(uuid.uuid4())
+def receipt_uuid() -> UUID4:
+    return uuid.uuid4()
 
 
 @pytest.fixture(scope="function")

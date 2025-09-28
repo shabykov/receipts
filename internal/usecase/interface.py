@@ -2,11 +2,11 @@
 # are used as entrypoints of the application
 import typing as t
 from abc import ABC, abstractmethod
+from pydantic import UUID4
 
 from internal.domain.user.id import UserId
 from internal.domain.image import Image
 from internal.domain.receipt import Receipt
-from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.domain.receipt.item import Choice
 from internal.domain.user import User
 
@@ -19,7 +19,7 @@ class IReceiptRecognizeUC(ABC):
 
 class IReceiptReadUC(ABC):
     @abstractmethod
-    def read(self, receipt_uuid: ReceiptUUID) -> t.Optional[Receipt]:
+    def read(self, receipt_uuid: UUID4) -> t.Optional[Receipt]:
         # public read interface
         raise NotImplementedError("method `.read()` must be implemented")
 

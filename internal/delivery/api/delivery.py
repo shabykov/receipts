@@ -4,9 +4,9 @@ import flask
 import pydantic
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
+from pydantic import UUID4
 
 from internal.domain.receipt import ReceiptRecognizeError
-from internal.domain.receipt.receipt_uuid import ReceiptUUID
 from internal.domain.user.id import UserId
 from internal.usecase.interface import IReceiptReadUC, IReceiptRecognizeUC
 from .convert import convert
@@ -123,7 +123,7 @@ class Delivery:
 
                         receipt = self.receipt_recognizer_uc.recognize(default_user_id, convert(file))
 
-                        return json.loads(receipt.model_dump_json()), 201  # TODO: fix receipt.model_dump()
+                        return receipt.model_dump(), 201
 
                     except ReceiptRecognizeError as err:
 
@@ -184,13 +184,13 @@ class Delivery:
                 """
 
                 try:
-                    uuid = ReceiptUUID(receipt_id)
+                    uuid = UUID4(receipt_id)
                 except pydantic.ValidationError as err:
                     return {'error': "input receipt_uuid is not valid: %s" % str(err)}, 400
 
                 receipt = self.receipt_reader_uc.read(uuid)
                 if receipt:
-                    return json.loads(receipt.model_dump_json()), 200  # TODO: fix receipt.model_dump()
+                    return receipt.model_dump(), 200
 
                 return jsonify({"message": "not found"}), 404
 

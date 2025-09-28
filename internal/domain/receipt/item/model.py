@@ -2,7 +2,7 @@ import typing as t
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel, Field, UUID4, field_serializer
 
 from pkg.datetime import now
 
@@ -60,11 +60,21 @@ class ReceiptItem(BaseModel):
         default_factory=now
     )
     splits: t.Set[Split] = Field(
-        default_factory=set
+        default_factory=set,
+        exclude=True,
     )
     split_error_message: str = Field(
-        default=""
+        default="",
+        exclude=True,
     )
+
+    @field_serializer('uuid')
+    def serialize_uuid(self, uuid: UUID4) -> str:
+        return str(uuid)
+
+    @field_serializer('created_at')
+    def serialize_timestamp(self, dt: datetime) -> str:
+        return dt.isoformat()
 
     def splits_as_json(self) -> t.List[str]:
         return [s.model_dump_json() for s in self.splits]
