@@ -1,5 +1,6 @@
 aiohttp==3.9.5
 aiosignal==1.3.1
+aniso8601==10.0.1
 annotated-types==0.6.0
 anthropic==0.25.7
 anyio==4.3.0
@@ -11,8 +12,10 @@ click==8.1.7
 distro==1.9.0
 docstring_parser==0.16
 filelock==3.14.0
+flasgger==0.9.7.1
 Flask==3.0.3
 Flask-Pydantic==0.12.0
+Flask-RESTful==0.3.10
 frozenlist==1.4.1
 fsspec==2024.3.1
 h11==0.14.0
@@ -24,9 +27,12 @@ iniconfig==2.0.0
 instructor==1.2.5
 itsdangerous==2.2.0
 Jinja2==3.1.4
+jsonschema==4.25.1
+jsonschema-specifications==2025.9.1
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 mdurl==0.1.2
+mistune==3.1.4
 multidict==6.0.5
 openai==1.25.0
 packaging==24.0
@@ -40,10 +46,14 @@ Pygments==2.17.2
 pyTelegramBotAPI==4.17.0
 pytest==8.3.2
 python-dotenv==1.0.1
+pytz==2025.2
 PyYAML==6.0.1
+referencing==0.36.2
 requests==2.31.0
 rich==13.7.1
+rpds-py==0.27.1
 shellingham==1.5.4
+six==1.17.0
 sniffio==1.3.1
 tenacity==8.2.3
 tokenizers==0.19.1
