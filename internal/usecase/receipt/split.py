@@ -3,7 +3,7 @@ from logging import getLogger
 
 from internal.domain.receipt import Receipt
 from internal.domain.receipt.item import Choice
-from internal.usecase.adapters.receipt.item import IUpdater
+from internal.usecase.ports.receipt.item import IUpdater
 from internal.usecase.interface import (
     IUserReadUC,
     IReceiptSplitUC,

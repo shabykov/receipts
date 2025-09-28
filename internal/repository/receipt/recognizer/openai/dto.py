@@ -54,6 +54,7 @@ def convert(data: ReceiptDTO) -> Receipt:
         tips=data.tips,
         subtotal=data.subtotal,
         total=data.total
+
     )
 
 

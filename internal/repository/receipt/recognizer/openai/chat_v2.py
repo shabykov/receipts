@@ -13,7 +13,7 @@ from internal.domain.receipt import (
     Receipt,
     ReceiptRecognizeError,
 )
-from internal.usecase.adapters.receipt import IRecognizer
+from internal.usecase.ports.receipt import IRecognizer
 from .dto import convert, ReceiptDTO
 
 logger = getLogger("receipt.recognizer.catgpt")

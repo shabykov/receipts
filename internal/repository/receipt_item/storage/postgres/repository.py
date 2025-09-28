@@ -10,7 +10,7 @@ from internal.domain.receipt.item import (
     ReceiptItemUpdateError,
     ReceiptItemReadError,
 )
-from internal.usecase.adapters.receipt.item import (
+from internal.usecase.ports.receipt.item import (
     ICreator,
     IUpdater,
     IReader,

@@ -1,8 +1,8 @@
 import typing as t
 from logging import getLogger
-from pydantic import UUID4
 
 import psycopg
+from pydantic import UUID4
 
 from internal.domain.receipt import (
     Receipt,
@@ -10,16 +10,16 @@ from internal.domain.receipt import (
     ReceiptCreateError,
     ReceiptUpdateError,
 )
-from internal.domain.user.id import UserId
 from internal.domain.receipt.item import (
     ReceiptItemCreateError,
     ReceiptItemReadError,
     ReceiptItemUpdateError,
 )
+from internal.domain.user.id import UserId
 from internal.repository.receipt_item.storage.postgres.repository import (
     Repository as ItemRepository
 )
-from internal.usecase.adapters.receipt import (
+from internal.usecase.ports.receipt import (
     ICreator,
     IUpdater,
     IReader,
@@ -38,6 +38,7 @@ CREATE_SCHEMA_SQL = b"""
         subtotal   double precision,
         tips       double precision,
         total      double precision,
+        status     varchar(300),
         created_at timestamp without time zone
     );
 """
@@ -56,7 +57,8 @@ INSERT_RECEIPT_SQL = b"""
         time, 
         subtotal, 
         tips, 
-        total, 
+        total,
+        status, 
         created_at
     )
     VALUES (
@@ -69,6 +71,7 @@ INSERT_RECEIPT_SQL = b"""
         %(subtotal)s,
         %(tips)s,
         %(total)s,
+        %(status)s,
         %(created_at)s
     ) ON CONFLICT (uuid) DO NOTHING;
 """
@@ -83,7 +86,8 @@ UPSERT_RECEIPT_SQL = b"""
         time, 
         subtotal, 
         tips, 
-        total
+        total,
+        status
     )
     VALUES (
         %(user_id)s, 
@@ -94,7 +98,8 @@ UPSERT_RECEIPT_SQL = b"""
         %(time)s,
         %(subtotal)s,
         %(tips)s,
-        %(total)s
+        %(total)s,
+        %(status)s
     )
     ON CONFLICT(uuid)
     DO UPDATE SET
@@ -104,7 +109,8 @@ UPSERT_RECEIPT_SQL = b"""
         time = EXCLUDED.time,
         subtotal = EXCLUDED.subtotal,
         tips = EXCLUDED.tips,
-        total = EXCLUDED.total;
+        total = EXCLUDED.total,
+        status = EXCLUDED.status;
 """
 
 SELECT_RECEIPT_SQL = b"""
@@ -117,7 +123,8 @@ SELECT_RECEIPT_SQL = b"""
         time, 
         subtotal, 
         tips, 
-        total, 
+        total,
+        status,  
         created_at
     FROM tbl_receipt 
     WHERE uuid = %(uuid)s;
@@ -162,6 +169,7 @@ class Repository(ICreator, IUpdater, IReader):
                         'subtotal': receipt.subtotal,
                         'tips': receipt.tips,
                         'total': receipt.total,
+                        'status': receipt.status,
                         'created_at': receipt.created_at
                     }
                 )
@@ -197,7 +205,8 @@ class Repository(ICreator, IUpdater, IReader):
                         'time': receipt.time,
                         'subtotal': receipt.subtotal,
                         'tips': receipt.tips,
-                        'total': receipt.total
+                        'total': receipt.total,
+                        'status': receipt.status
                     }
                 )
         except psycopg.errors.DatabaseError as e:
@@ -241,7 +250,8 @@ class Repository(ICreator, IUpdater, IReader):
             subtotal=row[6],
             tips=row[7],
             total=row[8],
-            created_at=row[9]
+            status=row[9],
+            created_at=row[10]
         )
         ret.items = items
         return ret

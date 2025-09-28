@@ -5,7 +5,7 @@ import psycopg
 from internal.domain.user import User, UserCreateError, UserReadError
 from internal.domain.user.id import UserId
 from internal.domain.user.username import Username
-from internal.usecase.adapters.user import IReader, ICreator
+from internal.usecase.ports.user import IReader, ICreator
 
 CREATE_SCHEMA_SQL = b"""
     CREATE TABLE IF NOT EXISTS tbl_user (

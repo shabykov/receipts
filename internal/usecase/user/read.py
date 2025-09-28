@@ -2,7 +2,7 @@ import typing as t
 
 from internal.domain.user import User
 from internal.domain.user.id import UserId
-from internal.usecase.adapters.user import IReader, ICreator
+from internal.usecase.ports.user import IReader, ICreator
 from internal.usecase.interface import IUserReadUC
 
 

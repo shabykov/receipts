@@ -1,3 +1,4 @@
+import enum
 import typing as t
 import uuid
 from collections import defaultdict
@@ -16,6 +17,12 @@ class Result(BaseModel):
     tips: float = Field(
         default=0.0
     )
+
+
+class Status(enum.StrEnum):
+    UNSPECIFIED = "unspecified"
+    FORWARDED = "forwarded"
+    RECOGNIZED = "recognized"
 
 
 class Receipt(BaseModel):
@@ -51,6 +58,9 @@ class Receipt(BaseModel):
     )
     created_at: datetime = Field(
         default_factory=now
+    )
+    status: Status = Field(
+        default=Status.UNSPECIFIED
     )
 
     @field_serializer('uuid')
@@ -106,7 +116,8 @@ def new(
         items: t.List[ReceiptItem],
         tips: float,
         subtotal: float,
-        total: float) -> Receipt:
+        total: float,
+) -> Receipt:
     return Receipt(
         store_name=store_name if store_name else "unknown",
         store_addr=store_addr if store_addr else "unknown",
@@ -116,4 +127,5 @@ def new(
         tips=tips if tips else 0,
         subtotal=subtotal if subtotal else 0,
         total=total if total else 0,
+        status=Status.RECOGNIZED
     )

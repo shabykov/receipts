@@ -11,5 +11,3 @@ class Image(ABC):
     @abstractmethod
     def data(self) -> str:
         raise NotImplementedError("method `.string()` must be implemented")
-
-
