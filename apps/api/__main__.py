@@ -76,6 +76,6 @@ class App:
 if __name__ == "__main__":
     web_app = App(http_listener=delivery)
 
-    logger.info("start web web")
+    logger.info("start rest api")
 
     web_app.start()
